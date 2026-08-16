@@ -6,16 +6,16 @@ import {
   playGooseSynthetic,
 } from '../utils/gooseSample';
 import {
-  loadDogSample,
-  playDogFromSample,
-  playDogSynthetic,
-} from '../utils/dogSample';
+  loadLaserSample,
+  playLaserFromSample,
+  playLaserSynthetic,
+} from '../utils/laserSample';
 
 export const SOUND_TYPES = {
   wood: { name: '木質' },
   electronic: { name: '電子' },
   goose: { name: '鵝叫' },
-  dog: { name: '小狗' },
+  laser: { name: '雷射' },
   bell: { name: '清脆' },
   frog: { name: '蛙鳴' },
 };
@@ -50,7 +50,7 @@ export function useMetronome({
   const displayedBeatRef = useRef(-1);
   const isRunningRef = useRef(false);
   const gooseBufferRef = useRef(null);
-  const dogBufferRef = useRef(null);
+  const laserBufferRef = useRef(null);
 
   const accentEnabledRef = useRef(accentEnabled);
   const soundTypeRef = useRef(sound);
@@ -144,8 +144,8 @@ export function useMetronome({
     loadGooseSample(ctx).then((buffer) => {
       if (buffer) gooseBufferRef.current = buffer;
     });
-    loadDogSample(ctx).then((buffer) => {
-      if (buffer) dogBufferRef.current = buffer;
+    loadLaserSample(ctx).then((buffer) => {
+      if (buffer) laserBufferRef.current = buffer;
     });
   }, [initAudioContext]);
 
@@ -158,13 +158,13 @@ export function useMetronome({
     playGooseSynthetic(ctx, master, time, isAccent, peak);
   }, []);
 
-  const playDog = useCallback((ctx, master, time, isAccent) => {
+  const playLaser = useCallback((ctx, master, time, isAccent) => {
     const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
-    const buffer = dogBufferRef.current;
-    if (buffer && playDogFromSample(ctx, master, buffer, time, isAccent, peak)) {
+    const buffer = laserBufferRef.current;
+    if (buffer && playLaserFromSample(ctx, master, buffer, time, isAccent, peak)) {
       return;
     }
-    playDogSynthetic(ctx, master, time, isAccent, peak);
+    playLaserSynthetic(ctx, master, time, isAccent, peak);
   }, []);
 
   const playBell = useCallback((ctx, master, time, isAccent) => {
@@ -217,8 +217,8 @@ export function useMetronome({
       case 'goose':
         playGoose(ctx, master, time, isAccent);
         break;
-      case 'dog':
-        playDog(ctx, master, time, isAccent);
+      case 'laser':
+        playLaser(ctx, master, time, isAccent);
         break;
       case 'bell':
         playBell(ctx, master, time, isAccent);
@@ -229,7 +229,7 @@ export function useMetronome({
       default:
         playWood(ctx, master, time, isAccent);
     }
-  }, [playElectronic, playGoose, playDog, playBell, playFrog, playWood]);
+  }, [playElectronic, playGoose, playLaser, playBell, playFrog, playWood]);
 
   useEffect(() => {
     playSoundRef.current = playSound;

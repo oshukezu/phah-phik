@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, '..', 'public', 'sounds');
-const outFile = path.join(outDir, 'dog-maltese.mp3');
+const outFile = path.join(outDir, 'laser2.mp3');
 
-const url = 'https://taira-komori.net/sound_os2/animals01/maltese_dog4.mp3';
+const url = 'https://taira-komori.net/sound_os2/arms01/laser2.mp3';
 
 const response = await fetch(url, {
   headers: {

@@ -9,7 +9,7 @@
 - **超大 BPM**：點數字即可調整每分鐘拍數（40–208）
 - **拍號**：2/4、3/4、4/4 或自訂（1–16 拍）
 - **練習計時**：分＋秒，倒數結束自動停止；可按「不限時」一鍵歸零無限播放
-- **六種音色**：木質、電子、清脆、小狗、蛙鳴、鵝叫
+- **六種音色**：木質、電子、清脆、雷射、蛙鳴、鵝叫
 - **重拍／節奏閃爍**：第一拍可加強音與邊緣閃爍（重拍為珊瑚紅）
 - **半圓節拍圖**：BPM 數字上方顯示弧線與拍點，播放時高亮當前拍
 - **音量**：預設 60%，更多設定內可調 0–100%
@@ -42,7 +42,7 @@ npm run preview # 預覽 build 結果
 ## 技術棧
 
 - React 19 + Vite 7
-- Web Audio API（音色合成；小狗、鵝叫使用本地樣本 + 合成備援）
+- Web Audio API（音色合成；雷射、鵝叫使用本地樣本 + 合成備援）
 - localStorage（設定持久化）
 - PWA（`manifest.webmanifest` + Service Worker）
 
@@ -51,7 +51,7 @@ npm run preview # 預覽 build 結果
 建置時以 `npm run fetch-sounds` 下載並打包至 `public/sounds/`（僅供個人專案使用）：
 
 - **鵝叫**：Google 翻譯 TTS 中文「鵝」
-- **小狗**：[小森平 免費音效](https://taira-komori.net/) `maltese_dog4.mp3`
+- **雷射**：[小森平 免費音效](https://taira-komori.net/) `laser2.mp3`（播放增益 +50%）
 
 ## 專案文件
 

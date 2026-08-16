@@ -1,4 +1,4 @@
-const CACHE = 'elder-metronome-v10';
+const CACHE = 'elder-metronome-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -6,7 +6,7 @@ const ASSETS = [
   './icons/metronome.png',
   './icons/duck-face.png',
   './sounds/goose-zh-tw.mp3',
-  './sounds/dog-maltese.mp3',
+  './sounds/laser2.mp3',
 ];
 
 self.addEventListener('install', (event) => {

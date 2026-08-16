@@ -4,7 +4,7 @@ const SOUND_OPTIONS = [
   { id: 'wood', label: '木質' },
   { id: 'electronic', label: '電子' },
   { id: 'bell', label: '清脆' },
-  { id: 'dog', label: '小狗' },
+  { id: 'laser', label: '雷射' },
   { id: 'frog', label: '蛙鳴' },
   { id: 'goose', label: '鵝叫' },
 ];
