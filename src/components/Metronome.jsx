@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useMetronome } from '../hooks/useMetronome';
 import {
   useSettingsState,
@@ -30,9 +30,8 @@ export default function Metronome() {
     () => !isStandalone() && !loadRaw().tutorialDismissed
   );
   const [practiceEnd, setPracticeEnd] = useState(false);
-  const [iosHintVariant, setIosHintVariant] = useState(null);
+  const [showPreStartHint, setShowPreStartHint] = useState(false);
   const pendingStartRef = useRef(false);
-  const previewFeedbackTimerRef = useRef(null);
   const [bpmInput, setBpmInput] = useState(String(settings.bpm));
   const [timerMinInput, setTimerMinInput] = useState(
     settings.timerMinutes > 0 ? String(settings.timerMinutes) : ''
@@ -54,7 +53,6 @@ export default function Metronome() {
     beatProgress,
     start,
     stop,
-    previewSound,
     clampBpm: clampBpmEngine,
   } = useMetronome({
     bpm: settings.bpm,
@@ -128,13 +126,6 @@ export default function Metronome() {
     setShowTutorial(false);
   };
 
-  const clearPreviewFeedbackTimer = useCallback(() => {
-    if (previewFeedbackTimerRef.current) {
-      clearTimeout(previewFeedbackTimerRef.current);
-      previewFeedbackTimerRef.current = null;
-    }
-  }, []);
-
   const handlePlayToggle = useCallback(() => {
     if (isPlaying) {
       stop();
@@ -142,7 +133,7 @@ export default function Metronome() {
     }
     if (isIOS() && !settings.iosMuteHintSeen) {
       pendingStartRef.current = true;
-      setIosHintVariant('preStart');
+      setShowPreStartHint(true);
       return;
     }
     start();
@@ -150,43 +141,12 @@ export default function Metronome() {
 
   const handlePreStartConfirm = useCallback(() => {
     save({ iosMuteHintSeen: true });
-    setIosHintVariant(null);
+    setShowPreStartHint(false);
     if (pendingStartRef.current) {
       pendingStartRef.current = false;
       start();
     }
   }, [save, start]);
-
-  const handlePreviewSound = useCallback(async () => {
-    clearPreviewFeedbackTimer();
-    await previewSound();
-    if (!isIOS()) return;
-    previewFeedbackTimerRef.current = setTimeout(() => {
-      setIosHintVariant('previewAsk');
-      previewFeedbackTimerRef.current = null;
-    }, 500);
-  }, [clearPreviewFeedbackTimer, previewSound]);
-
-  const handlePreviewHeard = useCallback(() => {
-    clearPreviewFeedbackTimer();
-    setIosHintVariant(null);
-  }, [clearPreviewFeedbackTimer]);
-
-  const handlePreviewNoSound = useCallback(() => {
-    clearPreviewFeedbackTimer();
-    setIosHintVariant('previewGuide');
-  }, [clearPreviewFeedbackTimer]);
-
-  const handleShowSoundHint = useCallback(() => {
-    clearPreviewFeedbackTimer();
-    setIosHintVariant('previewGuide');
-  }, [clearPreviewFeedbackTimer]);
-
-  const handleIosHintDismiss = useCallback(() => {
-    setIosHintVariant(null);
-  }, []);
-
-  useEffect(() => () => clearPreviewFeedbackTimer(), [clearPreviewFeedbackTimer]);
 
   const manyDots = settings.beats > 8;
 
@@ -394,8 +354,6 @@ export default function Metronome() {
           themeMode={themeMode}
           onThemeChange={setTheme}
           onShowTutorial={() => setShowTutorial(true)}
-          onShowSoundHint={isIOS() ? handleShowSoundHint : undefined}
-          onPreviewSound={handlePreviewSound}
         />
 
         <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
@@ -422,13 +380,7 @@ export default function Metronome() {
       <TutorialOverlay open={showTutorial} onDismiss={dismissTutorial} />
 
       {isIOS() && (
-        <IosSoundHint
-          open={Boolean(iosHintVariant)}
-          variant={iosHintVariant}
-          onConfirm={iosHintVariant === 'preStart' ? handlePreStartConfirm : handlePreviewHeard}
-          onDismiss={handleIosHintDismiss}
-          onNoSound={handlePreviewNoSound}
-        />
+        <IosSoundHint open={showPreStartHint} onConfirm={handlePreStartConfirm} />
       )}
     </div>
   );

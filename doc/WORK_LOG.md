@@ -24,18 +24,20 @@
 | BeatArc 修正 | 加寬弧線、修正 viewBox 裁切；單一圓點連續滑動；淡色單色階（指示點比弧線略深） |
 | 音色 | 底鼓改為鵝叫（`goose`）；`kick` 設定自動遷移；鵝叫改為 F0 陽平 + F1/F2 母音合成 |
 | 圖示 | 主畫面／PWA：`metronome.png`；瀏覽器分頁 favicon：`duck-face.png` |
-| iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume`；更多設定「試聽一下」 |
-| iOS 靜音提醒 v2 | 無法程式偵測靜音鍵；首次開始前提示、`audioSession.playback`、試聽後自回報、「再看聲音提示」 |
+| iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume` |
+| iOS 靜音提醒 v2 | 無法程式偵測靜音鍵；首次開始前提示、`audioSession.playback` |
 | UI 間距調整 | 拍號改左標籤右按鈕；收緊拍點圓點與面板間距；iOS 未播放常駐聲音橫幅 |
 | 鵝叫音色 v3 | 混合方案：Wiktionary zh-é.ogg 裁切播放 + 合成備援 |
 | 版面放寬 | 主內容三區垂直均分（BPM／面板／開始鈕）；取消播放中 iOS「聽不到聲音」底部提示 |
 | 面板固定 | 展開更多設定時主區不壓縮；設定區內捲動 |
 | 鵝叫 v4 | Google 翻譯 TTS「鵝」打包（`goose-zh-tw.mp3`），極短裁切 0.12–0.18s |
+| 試聽移除 | 更多設定取消「試聽一下」「再看聲音提示」；`IosSoundHint` 僅保留首次開始前 `preStart` |
+| 鵝叫 v5 | 拉長裁切（弱拍 0.42s／重拍 0.55s）、放慢 playbackRate，迷因感拖長母音 |
 
 ### iOS 靜音鍵（平台限制）
 
 - **無法**由 PWA 程式偵測 iPhone 側邊靜音鍵狀態（無官方 Web API）
-- 採主動提醒：首次按開始、試聽後自回報、播放中底部提示
+- 採主動提醒：首次按開始前提示、未播放常駐橫幅、教學 overlay 說明
 - Safari 嘗試 `navigator.audioSession.type = 'playback'`，可能讓 Web Audio 在靜音鍵 ON 時仍出聲（需實機驗證）
 - 若仍無聲：引導關閉靜音鍵、接耳機，或開始播放後調媒體音量
 - 原生 App（Capacitor + `AVAudioSession`）為另一條路，本次不納入

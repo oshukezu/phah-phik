@@ -361,25 +361,6 @@ export function useMetronome({
     setMediaSessionPaused();
   }, [stopSchedulers, setMediaSessionPaused]);
 
-  const previewSound = useCallback(async () => {
-    const ctx = initAudioContext();
-    if (ctx.state === 'suspended') await ctx.resume();
-
-    const hadMaster = Boolean(masterGainRef.current);
-    if (!hadMaster) createMasterGain();
-
-    playSoundRef.current(ctx.currentTime, true);
-
-    if (!hadMaster && !isRunningRef.current) {
-      setTimeout(() => {
-        if (!isRunningRef.current && masterGainRef.current) {
-          masterGainRef.current.disconnect();
-          masterGainRef.current = null;
-        }
-      }, 500);
-    }
-  }, [initAudioContext, createMasterGain]);
-
   useEffect(() => {
     if (isRunningRef.current) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- resync audio when tempo/config changes during play
@@ -429,6 +410,5 @@ export function useMetronome({
     stop,
     setBpm,
     clampBpm,
-    previewSound,
   };
 }

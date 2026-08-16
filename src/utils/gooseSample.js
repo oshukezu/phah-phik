@@ -1,8 +1,8 @@
-const GOOSE_OFFSET_SEC = 0.05;
-const GOOSE_ACCENT_DURATION = 0.18;
-const GOOSE_WEAK_DURATION = 0.12;
-const GOOSE_ACCENT_RATE = 1.15;
-const GOOSE_WEAK_RATE = 1.1;
+const GOOSE_OFFSET_SEC = 0;
+const GOOSE_ACCENT_DURATION = 0.55;
+const GOOSE_WEAK_DURATION = 0.42;
+const GOOSE_ACCENT_RATE = 0.92;
+const GOOSE_WEAK_RATE = 0.88;
 
 let gooseBufferPromise = null;
 
@@ -39,7 +39,7 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
   gain.connect(master);
   const audibleDuration = playDuration / playbackRate;
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.008);
+  gain.gain.linearRampToValueAtTime(peak, time + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, time + audibleDuration);
 
   source.connect(gain);
@@ -48,14 +48,14 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
 }
 
 export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
-  const dur = isAccent ? 0.16 : 0.12;
-  const f0Start = isAccent ? 320 : 300;
-  const f0End = isAccent ? 540 : 500;
+  const dur = isAccent ? 0.45 : 0.35;
+  const f0Start = isAccent ? 300 : 280;
+  const f0End = isAccent ? 520 : 480;
 
   const osc = ctx.createOscillator();
   osc.type = 'sine';
   osc.frequency.setValueAtTime(f0Start, time);
-  osc.frequency.exponentialRampToValueAtTime(f0End, time + dur * 0.85);
+  osc.frequency.exponentialRampToValueAtTime(f0End, time + dur * 0.9);
 
   const formant = ctx.createBiquadFilter();
   formant.type = 'bandpass';
@@ -65,7 +65,7 @@ export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
   const gain = ctx.createGain();
   gain.connect(master);
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.01);
+  gain.gain.linearRampToValueAtTime(peak, time + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
 
   osc.connect(formant);
