@@ -279,3 +279,29 @@
     padding: 0.5rem 0.375rem;
   }
 }
+
+.more-sidebar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .more-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: var(--surface-elevated);
+    position: sticky;
+    top: calc(1rem + var(--safe-top));
+    max-height: calc(100dvh - 2rem - var(--safe-top));
+    overflow-y: auto;
+  }
+
+  .more-sidebar-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+}

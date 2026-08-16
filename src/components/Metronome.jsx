@@ -13,9 +13,9 @@ import {
 import { useWakeLock } from '../hooks/useWakeLock';
 import { usePracticeTimer } from '../hooks/usePracticeTimer';
 import { useTheme } from '../hooks/useTheme';
-import { useMediaQuery, SETTINGS_SHEET_QUERY } from '../hooks/useMediaQuery';
+import { useMediaQuery, SETTINGS_SHEET_QUERY, SETTINGS_SIDEBAR_QUERY } from '../hooks/useMediaQuery';
 import { isIOS } from '../utils/platform';
-import MoreSettings from './MoreSettings';
+import MoreSettings, { MoreSettingsSidebar } from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
 import IosSoundHint from './IosSoundHint';
 import PhahPhikModal from './PhahPhikModal';
@@ -213,9 +213,27 @@ export default function Metronome() {
 
   const manyDots = settings.beats > 8;
   const settingsSheet = useMediaQuery(SETTINGS_SHEET_QUERY);
+  const settingsSidebar = useMediaQuery(SETTINGS_SIDEBAR_QUERY);
+  const settingsOpenInline = moreOpen && !settingsSheet && !settingsSidebar;
+
+  const moreSettingsProps = {
+    open: moreOpen,
+    onToggleOpen: () => setMoreOpen((o) => !o),
+    accentEnabled: settings.accentEnabled,
+    onAccentChange: (v) => save({ accentEnabled: v }),
+    flashEnabled: settings.flashEnabled,
+    onFlashChange: (v) => save({ flashEnabled: v }),
+    volume: settings.volume,
+    onVolumeChange: (v) => save({ volume: clampVolume(v) }),
+    sound: settings.sound,
+    onSoundChange: (v) => save({ sound: v }),
+    themeMode,
+    onThemeChange: setTheme,
+    onShowTutorial: () => setShowTutorial(true),
+  };
 
   return (
-    <div className={`metronome${moreOpen && !settingsSheet ? ' metronome-settings-open' : ''}`}>
+    <div className={`metronome${settingsOpenInline ? ' metronome-settings-open' : ''}`}>
       {isBeatFlash && (
         <div
           key={beatTick}
@@ -230,6 +248,8 @@ export default function Metronome() {
         </div>
       )}
 
+      <div className="metronome-layout">
+        <div className="metronome-column">
       <div className="metronome-main">
         <div className="metronome-zone metronome-zone-bpm">
           <div className="bpm-block">
@@ -404,21 +424,7 @@ export default function Metronome() {
       </div>
 
       <div className="metronome-footer">
-        <MoreSettings
-          open={moreOpen}
-          onToggleOpen={() => setMoreOpen((o) => !o)}
-          accentEnabled={settings.accentEnabled}
-          onAccentChange={(v) => save({ accentEnabled: v })}
-          flashEnabled={settings.flashEnabled}
-          onFlashChange={(v) => save({ flashEnabled: v })}
-          volume={settings.volume}
-          onVolumeChange={(v) => save({ volume: clampVolume(v) })}
-          sound={settings.sound}
-          onSoundChange={(v) => save({ sound: v })}
-          themeMode={themeMode}
-          onThemeChange={setTheme}
-          onShowTutorial={() => setShowTutorial(true)}
-        />
+        <MoreSettings {...moreSettingsProps} />
 
         <p className="app-credit">
           <button
@@ -430,6 +436,10 @@ export default function Metronome() {
           </button>
           {' '}Developed by J.J. Wang
         </p>
+      </div>
+        </div>
+
+        <MoreSettingsSidebar {...moreSettingsProps} />
       </div>
 
       {showWakeHint && (

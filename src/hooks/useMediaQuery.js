@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export const SETTINGS_SHEET_QUERY = '(max-height: 720px)';
+export const SETTINGS_SIDEBAR_QUERY = '(min-width: 768px)';
 
 export function useMediaQuery(query) {
   const [matches, setMatches] = useState(() => {

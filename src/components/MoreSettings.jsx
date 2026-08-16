@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { useMediaQuery, SETTINGS_SHEET_QUERY } from '../hooks/useMediaQuery';
+import {
+  useMediaQuery,
+  SETTINGS_SHEET_QUERY,
+  SETTINGS_SIDEBAR_QUERY,
+} from '../hooks/useMediaQuery';
 import './MoreSettings.css';
 
 const SOUND_OPTIONS = [
@@ -131,6 +135,49 @@ function SettingsBody({
   );
 }
 
+function getSettingsBodyProps({
+  accentEnabled,
+  onAccentChange,
+  flashEnabled,
+  onFlashChange,
+  volume,
+  onVolumeChange,
+  sound,
+  onSoundChange,
+  themeMode,
+  onThemeChange,
+  onShowTutorial,
+}) {
+  return {
+    accentEnabled,
+    onAccentChange,
+    flashEnabled,
+    onFlashChange,
+    volumePercent: Math.round(volume * 100),
+    onVolumeChange,
+    sound,
+    onSoundChange,
+    themeMode,
+    onThemeChange,
+    onShowTutorial,
+  };
+}
+
+export function MoreSettingsSidebar(props) {
+  const useSheet = useMediaQuery(SETTINGS_SHEET_QUERY);
+  const useSidebar = useMediaQuery(SETTINGS_SIDEBAR_QUERY);
+  const showSidebar = props.open && useSidebar && !useSheet;
+
+  if (!showSidebar) return null;
+
+  return (
+    <aside className="more-sidebar" aria-label="更多設定">
+      <h2 className="more-sidebar-title">更多設定</h2>
+      <SettingsBody {...getSettingsBodyProps(props)} />
+    </aside>
+  );
+}
+
 export default function MoreSettings({
   open,
   onToggleOpen,
@@ -147,22 +194,22 @@ export default function MoreSettings({
   onShowTutorial,
 }) {
   const useSheet = useMediaQuery(SETTINGS_SHEET_QUERY);
+  const useSidebar = useMediaQuery(SETTINGS_SIDEBAR_QUERY);
   const showSheet = open && useSheet;
-  const volumePercent = Math.round(volume * 100);
-
-  const bodyProps = {
+  const showInline = open && !useSheet && !useSidebar;
+  const bodyProps = getSettingsBodyProps({
     accentEnabled,
     onAccentChange,
     flashEnabled,
     onFlashChange,
-    volumePercent,
+    volume,
     onVolumeChange,
     sound,
     onSoundChange,
     themeMode,
     onThemeChange,
     onShowTutorial,
-  };
+  });
 
   useEffect(() => {
     if (!showSheet) return;
@@ -174,7 +221,7 @@ export default function MoreSettings({
   }, [showSheet, onToggleOpen]);
 
   return (
-    <section className="more-settings" aria-label="更多設定">
+    <>
       {showSheet && (
         <button
           type="button"
@@ -184,20 +231,22 @@ export default function MoreSettings({
         />
       )}
 
-      <button
-        type="button"
-        className="more-toggle"
-        onClick={onToggleOpen}
-        aria-expanded={open}
-      >
-        {open ? '▲ 收合更多設定' : '▼ 更多設定'}
-      </button>
+      <section className="more-settings" aria-label="更多設定">
+        <button
+          type="button"
+          className="more-toggle"
+          onClick={onToggleOpen}
+          aria-expanded={open}
+        >
+          {open ? '▲ 收合更多設定' : '▼ 更多設定'}
+        </button>
 
-      {open && !useSheet && (
-        <div className="more-body">
-          <SettingsBody {...bodyProps} />
-        </div>
-      )}
+        {showInline && (
+          <div className="more-body">
+            <SettingsBody {...bodyProps} />
+          </div>
+        )}
+      </section>
 
       {showSheet && (
         <div
@@ -213,6 +262,6 @@ export default function MoreSettings({
           </div>
         </div>
       )}
-    </section>
+    </>
   );
 }

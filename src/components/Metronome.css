@@ -510,3 +510,23 @@
     flex: 0 0 auto;
   }
 }
+
+@media (min-width: 768px) {
+  .metronome-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 28rem);
+    justify-content: center;
+    align-items: start;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .metronome-layout:has(.more-sidebar) {
+    grid-template-columns: minmax(0, 28rem) minmax(16rem, 1fr);
+    justify-content: stretch;
+  }
+
+  .metronome-column {
+    min-width: 0;
+  }
+}

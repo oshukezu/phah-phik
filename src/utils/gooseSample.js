@@ -3,8 +3,13 @@ const GOOSE_ACCENT_DURATION = 0.55;
 const GOOSE_WEAK_DURATION = 0.42;
 const GOOSE_ACCENT_RATE = 0.92;
 const GOOSE_WEAK_RATE = 0.88;
+const GOOSE_GAIN_BOOST = 1.5;
 
 let gooseBufferPromise = null;
+
+function boostedPeak(peak) {
+  return Math.min(peak * GOOSE_GAIN_BOOST, 1.5);
+}
 
 export function getGooseSampleUrl() {
   return `${import.meta.env.BASE_URL}sounds/goose-zh-tw.mp3`;
@@ -39,7 +44,8 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
   gain.connect(master);
   const audibleDuration = playDuration / playbackRate;
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.02);
+  const level = boostedPeak(peak);
+  gain.gain.linearRampToValueAtTime(level, time + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, time + audibleDuration);
 
   source.connect(gain);
@@ -48,6 +54,7 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
 }
 
 export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
+  const level = boostedPeak(peak);
   const dur = isAccent ? 0.45 : 0.35;
   const f0Start = isAccent ? 300 : 280;
   const f0End = isAccent ? 520 : 480;
@@ -65,7 +72,7 @@ export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
   const gain = ctx.createGain();
   gain.connect(master);
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.02);
+  gain.gain.linearRampToValueAtTime(level, time + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
 
   osc.connect(formant);

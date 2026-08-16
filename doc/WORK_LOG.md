@@ -41,6 +41,8 @@
 | 詞源彈窗 | 底部「拍魄仔」連結；教育部辭典「拍拍」發音（`phah-phik-sutian.mp3`）；`sw.js` v12 |
 | 設定抽屜 | 小螢幕（max-height 720px）展開更多設定改底部抽屜，主區不再擠壓 |
 | 桌面設定 | 高視窗（min-height 721px）內嵌設定取消 vh 封頂與內捲，改整頁自然捲動 |
+| 桌面右側欄 | 寬螢幕（min-width 768px）展開設定改右側 sticky 欄，主區維持左欄 |
+| 鵝叫增益 | `gooseSample.js` 播放增益 +50%（`GOOSE_GAIN_BOOST = 1.5`） |
 
 ### iOS 靜音鍵（平台限制）
 
