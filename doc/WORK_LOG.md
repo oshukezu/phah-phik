@@ -38,6 +38,7 @@
 | 雷射 | 小狗改雷射（`laser2.mp3`）；id `laser`；播放增益 +50%；`sw.js` v11 |
 | BPM 滾輪 | BPM 數字區支援滾輪 ±1（40–208），阻擋該區帶動頁面捲動 |
 | BPM 手勢 | 手機於 BPM 區上下滑 ±1（每 28px 一步）；`touch-action: none` |
+| 詞源彈窗 | 底部「拍魄仔」連結；教育部辭典「拍拍」發音（`phah-phik-sutian.mp3`）；`sw.js` v12 |
 
 ### iOS 靜音鍵（平台限制）
 

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "fetch-sounds": "node scripts/fetch-goose-tts.mjs && node scripts/fetch-laser-sound.mjs",
+    "fetch-sounds": "node scripts/fetch-goose-tts.mjs && node scripts/fetch-laser-sound.mjs && node scripts/fetch-sutian-phah-phik.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

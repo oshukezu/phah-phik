@@ -1,0 +1,67 @@
+.phah-phik-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.phah-phik-card {
+  max-width: 22rem;
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.phah-phik-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.phah-phik-line {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.phah-phik-play {
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 1rem 0 0.75rem;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.phah-phik-source {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.phah-phik-source a {
+  color: var(--accent-secondary);
+}
+
+.phah-phik-dismiss {
+  width: 100%;
+  min-height: 3rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}

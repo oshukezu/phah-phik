@@ -52,6 +52,7 @@ npm run preview # 預覽 build 結果
 
 - **鵝叫**：Google 翻譯 TTS 中文「鵝」
 - **雷射**：[小森平 免費音效](https://taira-komori.net/) `laser2.mp3`（播放增益 +50%）
+- **拍魄仔發音**：[教育部臺灣台語常用詞辭典](https://sutian.moe.edu.tw/zh-hant/su/4034/)「拍拍」詞目音檔
 
 ## 專案文件
 

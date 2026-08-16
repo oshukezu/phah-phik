@@ -17,6 +17,7 @@ import { isIOS } from '../utils/platform';
 import MoreSettings from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
 import IosSoundHint from './IosSoundHint';
+import PhahPhikModal from './PhahPhikModal';
 import BeatArc from './BeatArc';
 import './Metronome.css';
 
@@ -32,6 +33,7 @@ export default function Metronome() {
   );
   const [practiceEnd, setPracticeEnd] = useState(false);
   const [showPreStartHint, setShowPreStartHint] = useState(false);
+  const [showPhahPhikModal, setShowPhahPhikModal] = useState(false);
   const pendingStartRef = useRef(false);
   const bpmWrapRef = useRef(null);
   const bpmRef = useRef(settings.bpm);
@@ -416,7 +418,16 @@ export default function Metronome() {
           onShowTutorial={() => setShowTutorial(true)}
         />
 
-        <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
+        <p className="app-credit">
+          <button
+            type="button"
+            className="app-credit-link"
+            onClick={() => setShowPhahPhikModal(true)}
+          >
+            拍魄仔
+          </button>
+          {' '}Developed by J.J. Wang
+        </p>
       </div>
 
       {showWakeHint && (
@@ -438,6 +449,8 @@ export default function Metronome() {
       )}
 
       <TutorialOverlay open={showTutorial} onDismiss={dismissTutorial} />
+
+      <PhahPhikModal open={showPhahPhikModal} onClose={() => setShowPhahPhikModal(false)} />
 
       {isIOS() && (
         <IosSoundHint open={showPreStartHint} onConfirm={handlePreStartConfirm} />

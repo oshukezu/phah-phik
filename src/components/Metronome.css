@@ -487,3 +487,14 @@
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+.app-credit-link {
+  border: none;
+  padding: 0;
+  background: none;
+  color: var(--accent-secondary);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
