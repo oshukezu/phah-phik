@@ -26,6 +26,8 @@
 | 圖示 | 主畫面／PWA：`metronome.png`；瀏覽器分頁 favicon：`duck-face.png` |
 | iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume`；更多設定「試聽一下」 |
 | iOS 靜音提醒 v2 | 無法程式偵測靜音鍵；首次開始前提示、`audioSession.playback`、試聽後自回報、「再看聲音提示」 |
+| UI 間距調整 | 拍號改左標籤右按鈕；收緊拍點圓點與面板間距；iOS 未播放常駐聲音橫幅 |
+| 鵝叫音色 v3 | 混合方案：Wiktionary zh-é.ogg 裁切播放 + 合成備援 |
 
 ### iOS 靜音鍵（平台限制）
 

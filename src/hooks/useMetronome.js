@@ -1,5 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { requestPlaybackAudioSession } from '../utils/audioSession';
+import {
+  loadGooseSample,
+  playGooseFromSample,
+  playGooseSynthetic,
+} from '../utils/gooseSample';
 
 export const SOUND_TYPES = {
   wood: { name: '木質' },
@@ -39,6 +44,7 @@ export function useMetronome({
   const beatTimesRef = useRef([]);
   const displayedBeatRef = useRef(-1);
   const isRunningRef = useRef(false);
+  const gooseBufferRef = useRef(null);
 
   const accentEnabledRef = useRef(accentEnabled);
   const soundTypeRef = useRef(sound);
@@ -127,72 +133,20 @@ export function useMetronome({
     osc.stop(time + 0.09);
   }, []);
 
+  useEffect(() => {
+    const ctx = initAudioContext();
+    loadGooseSample(ctx).then((buffer) => {
+      if (buffer) gooseBufferRef.current = buffer;
+    });
+  }, [initAudioContext]);
+
   const playGoose = useCallback((ctx, master, time, isAccent) => {
     const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
-    const dur = isAccent ? 0.12 : 0.11;
-    const f0Start = isAccent ? 240 : 220;
-    const f0Mid = isAccent ? 300 : 275;
-    const f0End = isAccent ? 400 : 360;
-    const midAt = time + dur * 0.42;
-
-    const osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(f0Start, time);
-    osc.frequency.exponentialRampToValueAtTime(f0Mid, midAt);
-    osc.frequency.exponentialRampToValueAtTime(f0End, time + dur);
-
-    const f1 = ctx.createBiquadFilter();
-    f1.type = 'bandpass';
-    f1.frequency.setValueAtTime(480, time);
-    f1.Q.setValueAtTime(4, time);
-
-    const f2 = ctx.createBiquadFilter();
-    f2.type = 'bandpass';
-    f2.frequency.setValueAtTime(1750, time);
-    f2.Q.setValueAtTime(6, time);
-
-    const env = ctx.createGain();
-    env.connect(master);
-    env.gain.setValueAtTime(0, time);
-    env.gain.linearRampToValueAtTime(1, time + 0.01);
-    env.gain.exponentialRampToValueAtTime(0.001, time + dur);
-
-    const gainF1 = ctx.createGain();
-    gainF1.gain.setValueAtTime(peak * 0.72, time);
-    const gainF2 = ctx.createGain();
-    gainF2.gain.setValueAtTime(peak * 0.28, time);
-
-    osc.connect(f1);
-    f1.connect(gainF1);
-    gainF1.connect(env);
-    osc.connect(f2);
-    f2.connect(gainF2);
-    gainF2.connect(env);
-
-    const noiseLen = Math.floor(ctx.sampleRate * 0.012);
-    const buffer = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < noiseLen; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (noiseLen * 0.18));
+    const buffer = gooseBufferRef.current;
+    if (buffer && playGooseFromSample(ctx, master, buffer, time, isAccent, peak)) {
+      return;
     }
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(1200, time);
-    noiseFilter.Q.setValueAtTime(1.2, time);
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0, time);
-    noiseGain.gain.linearRampToValueAtTime(peak * 0.07, time + 0.004);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.022);
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(env);
-
-    osc.start(time);
-    osc.stop(time + dur + 0.02);
-    noise.start(time);
-    noise.stop(time + 0.025);
+    playGooseSynthetic(ctx, master, time, isAccent, peak);
   }, []);
 
   const playBoing = useCallback((ctx, master, time, isAccent) => {

@@ -42,9 +42,13 @@ npm run preview # 預覽 build 結果
 ## 技術棧
 
 - React 19 + Vite 7
-- Web Audio API（音色合成，無外部音檔）
+- Web Audio API（音色合成；鵝叫使用授權樣本 + 合成備援）
 - localStorage（設定持久化）
 - PWA（`manifest.webmanifest` + Service Worker）
+
+## 音訊素材
+
+「鵝叫」音色裁切自 [Wiktionary zh-é.ogg](https://zh.wiktionary.org/zh-hant/File:zh-%C3%A9.ogg)（CC BY-SA 3.0，Yue Tan / [Shtooka Project](http://packs.shtooka.net/)）。
 
 ## 專案文件
 

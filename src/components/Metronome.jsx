@@ -66,6 +66,7 @@ export default function Metronome() {
   });
 
   const { hasSupport: hasWakeLock } = useWakeLock(isPlaying);
+  const showIosIdleBanner = isIOS() && !isPlaying;
   const showIosSoundHint = isIOS() && isPlaying;
   const showWakeHint = !hasWakeLock && isPlaying;
 
@@ -249,27 +250,35 @@ export default function Metronome() {
         </div>
       </div>
 
+      {showIosIdleBanner && (
+        <p className="ios-idle-sound-banner" role="note">
+          請確認已關閉靜音鍵，或接上耳機；開始後可調媒體音量
+        </p>
+      )}
+
       <section className="home-panel" aria-label="拍號與練習時間">
-        <div className="panel-block">
-          <span className="panel-label">拍號</span>
-          <div className="seg-group seg-compact" role="group" aria-label="拍號">
-            {PRESETS.map((p) => (
+        <div className="timesig-block">
+          <div className="panel-block panel-block-row">
+            <span className="panel-label">拍號</span>
+            <div className="seg-group seg-compact panel-controls" role="group" aria-label="拍號">
+              {PRESETS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  className={`seg-btn ${settings.timeSigMode === p ? 'active' : ''}`}
+                  onClick={() => applyPreset(p)}
+                >
+                  {p}/4
+                </button>
+              ))}
               <button
-                key={p}
                 type="button"
-                className={`seg-btn ${settings.timeSigMode === p ? 'active' : ''}`}
-                onClick={() => applyPreset(p)}
+                className={`seg-btn ${settings.timeSigMode === 'custom' ? 'active' : ''}`}
+                onClick={() => applyPreset('custom')}
               >
-                {p}/4
+                自訂
               </button>
-            ))}
-            <button
-              type="button"
-              className={`seg-btn ${settings.timeSigMode === 'custom' ? 'active' : ''}`}
-              onClick={() => applyPreset('custom')}
-            >
-              自訂
-            </button>
+            </div>
           </div>
           {settings.timeSigMode === 'custom' && (
             <div className="timesig-custom">
