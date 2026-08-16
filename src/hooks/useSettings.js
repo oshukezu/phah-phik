@@ -14,6 +14,7 @@ const DEFAULTS = {
   timerSeconds: 0,
   volume: 0.6,
   tutorialDismissed: false,
+  iosMuteHintSeen: false,
 };
 
 const VALID_SOUNDS = ['wood', 'electronic', 'goose', 'boing', 'bell', 'frog'];
@@ -84,6 +85,7 @@ export function loadRaw() {
     parsed.sound = VALID_SOUNDS.includes(parsed.sound) ? parsed.sound : 'wood';
     parsed.accentEnabled = parsed.accentEnabled !== false;
     parsed.flashEnabled = parsed.flashEnabled === true;
+    parsed.iosMuteHintSeen = parsed.iosMuteHintSeen === true;
 
     return parsed;
   } catch {

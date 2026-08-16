@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { requestPlaybackAudioSession } from '../utils/audioSession';
 
 export const SOUND_TYPES = {
   wood: { name: '木質' },
@@ -67,6 +68,7 @@ export function useMetronome({
 
   const initAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
+      requestPlaybackAudioSession();
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
     return audioContextRef.current;

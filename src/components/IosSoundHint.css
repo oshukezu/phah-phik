@@ -1,0 +1,70 @@
+.ios-sound-hint-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ios-sound-hint-card {
+  max-width: 22rem;
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.ios-sound-hint-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+}
+
+.ios-sound-hint-body {
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.ios-sound-hint-list {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+
+.ios-sound-hint-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ios-sound-hint-primary,
+.ios-sound-hint-secondary {
+  flex: 1;
+  min-height: 3rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ios-sound-hint-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.ios-sound-hint-secondary {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.ios-sound-hint-actions .ios-sound-hint-primary,
+.ios-sound-hint-actions .ios-sound-hint-secondary {
+  flex: 1;
+}
+
+.ios-sound-hint-card > .ios-sound-hint-primary {
+  width: 100%;
+}

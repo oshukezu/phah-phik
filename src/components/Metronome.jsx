@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMetronome } from '../hooks/useMetronome';
 import {
   useSettingsState,
@@ -16,6 +16,7 @@ import { useTheme } from '../hooks/useTheme';
 import { isIOS } from '../utils/platform';
 import MoreSettings from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
+import IosSoundHint from './IosSoundHint';
 import BeatArc from './BeatArc';
 import './Metronome.css';
 
@@ -29,6 +30,9 @@ export default function Metronome() {
     () => !isStandalone() && !loadRaw().tutorialDismissed
   );
   const [practiceEnd, setPracticeEnd] = useState(false);
+  const [iosHintVariant, setIosHintVariant] = useState(null);
+  const pendingStartRef = useRef(false);
+  const previewFeedbackTimerRef = useRef(null);
   const [bpmInput, setBpmInput] = useState(String(settings.bpm));
   const [timerMinInput, setTimerMinInput] = useState(
     settings.timerMinutes > 0 ? String(settings.timerMinutes) : ''
@@ -48,7 +52,7 @@ export default function Metronome() {
     currentBeat,
     beatTick,
     beatProgress,
-    toggle,
+    start,
     stop,
     previewSound,
     clampBpm: clampBpmEngine,
@@ -123,6 +127,66 @@ export default function Metronome() {
     save({ tutorialDismissed: true });
     setShowTutorial(false);
   };
+
+  const clearPreviewFeedbackTimer = useCallback(() => {
+    if (previewFeedbackTimerRef.current) {
+      clearTimeout(previewFeedbackTimerRef.current);
+      previewFeedbackTimerRef.current = null;
+    }
+  }, []);
+
+  const handlePlayToggle = useCallback(() => {
+    if (isPlaying) {
+      stop();
+      return;
+    }
+    if (isIOS() && !settings.iosMuteHintSeen) {
+      pendingStartRef.current = true;
+      setIosHintVariant('preStart');
+      return;
+    }
+    start();
+  }, [isPlaying, settings.iosMuteHintSeen, start, stop]);
+
+  const handlePreStartConfirm = useCallback(() => {
+    save({ iosMuteHintSeen: true });
+    setIosHintVariant(null);
+    if (pendingStartRef.current) {
+      pendingStartRef.current = false;
+      start();
+    }
+  }, [save, start]);
+
+  const handlePreviewSound = useCallback(async () => {
+    clearPreviewFeedbackTimer();
+    await previewSound();
+    if (!isIOS()) return;
+    previewFeedbackTimerRef.current = setTimeout(() => {
+      setIosHintVariant('previewAsk');
+      previewFeedbackTimerRef.current = null;
+    }, 500);
+  }, [clearPreviewFeedbackTimer, previewSound]);
+
+  const handlePreviewHeard = useCallback(() => {
+    clearPreviewFeedbackTimer();
+    setIosHintVariant(null);
+  }, [clearPreviewFeedbackTimer]);
+
+  const handlePreviewNoSound = useCallback(() => {
+    clearPreviewFeedbackTimer();
+    setIosHintVariant('previewGuide');
+  }, [clearPreviewFeedbackTimer]);
+
+  const handleShowSoundHint = useCallback(() => {
+    clearPreviewFeedbackTimer();
+    setIosHintVariant('previewGuide');
+  }, [clearPreviewFeedbackTimer]);
+
+  const handleIosHintDismiss = useCallback(() => {
+    setIosHintVariant(null);
+  }, []);
+
+  useEffect(() => () => clearPreviewFeedbackTimer(), [clearPreviewFeedbackTimer]);
 
   const manyDots = settings.beats > 8;
 
@@ -293,7 +357,7 @@ export default function Metronome() {
           <button
             type="button"
             className={`ctrl-play ${isPlaying ? 'playing' : ''}`}
-            onClick={toggle}
+            onClick={handlePlayToggle}
             aria-label={isPlaying ? '停止' : '開始'}
           >
             {isPlaying ? '停止' : '開始'}
@@ -314,7 +378,8 @@ export default function Metronome() {
           themeMode={themeMode}
           onThemeChange={setTheme}
           onShowTutorial={() => setShowTutorial(true)}
-          onPreviewSound={previewSound}
+          onShowSoundHint={isIOS() ? handleShowSoundHint : undefined}
+          onPreviewSound={handlePreviewSound}
         />
 
         <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
@@ -346,6 +411,16 @@ export default function Metronome() {
       )}
 
       <TutorialOverlay open={showTutorial} onDismiss={dismissTutorial} />
+
+      {isIOS() && (
+        <IosSoundHint
+          open={Boolean(iosHintVariant)}
+          variant={iosHintVariant}
+          onConfirm={iosHintVariant === 'preStart' ? handlePreStartConfirm : handlePreviewHeard}
+          onDismiss={handleIosHintDismiss}
+          onNoSound={handlePreviewNoSound}
+        />
+      )}
     </div>
   );
 }

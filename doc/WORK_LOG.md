@@ -25,12 +25,15 @@
 | 音色 | 底鼓改為鵝叫（`goose`）；`kick` 設定自動遷移；鵝叫改為 F0 陽平 + F1/F2 母音合成 |
 | 圖示 | 主畫面／PWA：`metronome.png`；瀏覽器分頁 favicon：`duck-face.png` |
 | iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume`；更多設定「試聽一下」 |
+| iOS 靜音提醒 v2 | 無法程式偵測靜音鍵；首次開始前提示、`audioSession.playback`、試聽後自回報、「再看聲音提示」 |
 
 ### iOS 靜音鍵（平台限制）
 
-- iPhone 側邊靜音鍵 ON 時，PWA／Web Audio **無法**讓內建喇叭出聲（Apple 設計限制）
-- 解法：引導使用者關閉靜音鍵、接耳機，或開始播放後調媒體音量
-- 原生 App（Capacitor + `AVAudioSession`）才可能突破，本次不納入
+- **無法**由 PWA 程式偵測 iPhone 側邊靜音鍵狀態（無官方 Web API）
+- 採主動提醒：首次按開始、試聽後自回報、播放中底部提示
+- Safari 嘗試 `navigator.audioSession.type = 'playback'`，可能讓 Web Audio 在靜音鍵 ON 時仍出聲（需實機驗證）
+- 若仍無聲：引導關閉靜音鍵、接耳機，或開始播放後調媒體音量
+- 原生 App（Capacitor + `AVAudioSession`）為另一條路，本次不納入
 
 ### 程式碼健康
 

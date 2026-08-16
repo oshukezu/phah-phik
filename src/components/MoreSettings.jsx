@@ -39,6 +39,7 @@ export default function MoreSettings({
   themeMode,
   onThemeChange,
   onShowTutorial,
+  onShowSoundHint,
   onPreviewSound,
 }) {
   const volumePercent = Math.round(volume * 100);
@@ -143,6 +144,12 @@ export default function MoreSettings({
           <button type="button" className="text-btn" onClick={onShowTutorial}>
             再看使用教學
           </button>
+
+          {onShowSoundHint && (
+            <button type="button" className="text-btn" onClick={onShowSoundHint}>
+              再看聲音提示
+            </button>
+          )}
         </div>
       )}
     </section>
