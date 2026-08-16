@@ -1,0 +1,351 @@
+/* Edge glow — softer elder palette */
+.edge-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+}
+
+.edge-glow.active {
+  opacity: 1;
+  animation: glow-pulse 0.15s ease-out forwards;
+}
+
+.edge-glow.active.accent {
+  animation: glow-pulse-accent 0.2s ease-out forwards;
+}
+
+@keyframes glow-pulse {
+  from { opacity: 0.85; }
+  to { opacity: 0; }
+}
+
+@keyframes glow-pulse-accent {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.edge-glow-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(107, 189, 181, 0.55) 0%, transparent 100%);
+  filter: blur(18px);
+}
+
+.edge-glow-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(224, 122, 122, 0.55) 0%, transparent 100%);
+  filter: blur(18px);
+}
+
+.edge-glow-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 80px;
+  background: linear-gradient(to right, rgba(107, 189, 181, 0.45) 0%, transparent 100%);
+  filter: blur(20px);
+}
+
+.edge-glow-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 80px;
+  background: linear-gradient(to left, rgba(224, 122, 122, 0.45) 0%, transparent 100%);
+  filter: blur(20px);
+}
+
+.edge-glow.accent .edge-glow-top,
+.edge-glow.accent .edge-glow-bottom {
+  height: 130px;
+  filter: blur(22px);
+}
+
+[data-theme="dark"] .edge-glow-top {
+  background: linear-gradient(to bottom, rgba(90, 173, 166, 0.65) 0%, transparent 100%);
+}
+
+[data-theme="dark"] .edge-glow-bottom {
+  background: linear-gradient(to top, rgba(217, 107, 107, 0.65) 0%, transparent 100%);
+}
+
+/* Main layout */
+.metronome {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: calc(0.5rem + var(--safe-top)) 1rem calc(0.5rem + var(--safe-bottom));
+  gap: 0.375rem;
+}
+
+.bpm-block {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bpm-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.bpm-input {
+  width: min(100%, 14rem);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: clamp(3.5rem, 18vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  padding: 0.125rem;
+  border-bottom: 3px solid var(--border);
+  border-radius: 0;
+  caret-color: var(--accent);
+}
+
+.bpm-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.bpm-input:disabled {
+  opacity: 0.7;
+}
+
+.bpm-label {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  color: var(--text-muted);
+}
+
+.beat-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  max-width: 100%;
+}
+
+.beat-dots-many {
+  gap: 0.35rem;
+}
+
+.beat-dots-many .beat-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+}
+
+.beat-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--dot);
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+
+.beat-dot.accent-marker {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.beat-dot.active {
+  background: var(--dot-active);
+  transform: scale(1.35);
+}
+
+.beat-dot.active.accent-marker {
+  background: var(--accent);
+  transform: scale(1.5);
+}
+
+.home-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.panel-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.panel-block-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.panel-label {
+  flex: 0 0 4.25rem;
+  font-size: clamp(0.9375rem, 2.5vw, 1rem);
+  color: var(--text-muted);
+}
+
+.seg-group {
+  display: flex;
+  width: 100%;
+  gap: 0.375rem;
+}
+
+.seg-compact .seg-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.25rem;
+  font-size: clamp(0.8125rem, 2.2vw, 0.9375rem);
+}
+
+.seg-btn {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font-size: clamp(0.9375rem, 2.5vw, 1rem);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.seg-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.seg-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.timesig-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.timesig-num {
+  width: 3.5rem;
+  min-height: 2.75rem;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.timesig-slash {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+}
+
+.timesig-select {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.timer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.timer-input {
+  width: 4.5rem;
+  min-height: 2.75rem;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.timer-unit {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+
+.timer-countdown {
+  font-size: 0.9375rem;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.controls {
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+.ctrl-play {
+  width: 100%;
+  min-height: clamp(3.75rem, 9vh, 4.25rem);
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-play.playing {
+  background: var(--accent-secondary);
+}
+
+.wake-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.practice-end {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+}
+
+.practice-end p {
+  margin: 0;
+  padding: 1.5rem 2rem;
+  background: var(--surface-elevated);
+  border-radius: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}

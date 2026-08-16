@@ -1,0 +1,19 @@
+{
+  "name": "節拍器",
+  "short_name": "節拍器",
+  "description": "長輩友善節拍器，大字大按鈕，直覺操作",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#f5f7fa",
+  "orientation": "portrait",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

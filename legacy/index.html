@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F5F2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>節拍器</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <button type="button" id="settings-open" class="settings-open" aria-label="設定">設定</button>
+
+    <main class="main">
+      <div id="pendulum-mount" class="pendulum-mount" aria-hidden="true"></div>
+
+      <div class="bpm-block">
+        <label class="bpm-input-wrap" for="bpm-input">
+          <input
+            type="number"
+            id="bpm-input"
+            class="bpm-input"
+            min="40"
+            max="208"
+            step="1"
+            value="80"
+            inputmode="numeric"
+            aria-label="每分鐘拍數"
+          >
+          <span class="bpm-label">每分鐘拍數</span>
+        </label>
+        <div id="beat-dots" class="beat-dots" aria-label="拍點指示"></div>
+      </div>
+
+      <section class="home-panel" aria-label="拍號與練習時間">
+        <div class="panel-block">
+          <span class="panel-label">拍號</span>
+          <div class="seg-group seg-compact" role="group" aria-label="拍號">
+            <button type="button" class="seg-btn" data-timesig-preset="2">2/4</button>
+            <button type="button" class="seg-btn" data-timesig-preset="3">3/4</button>
+            <button type="button" class="seg-btn active" data-timesig-preset="4">4/4</button>
+            <button type="button" class="seg-btn" data-timesig-preset="custom">自訂</button>
+          </div>
+          <div id="timesig-custom" class="timesig-custom hidden">
+            <input type="number" id="beats-input" class="timesig-num" min="1" max="16" value="4" inputmode="numeric" aria-label="拍號分子">
+            <span class="timesig-slash">/</span>
+            <select id="note-input" class="timesig-select" aria-label="拍號分母">
+              <option value="2">2</option>
+              <option value="4" selected>4</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-block panel-block-row">
+          <label class="panel-label" for="timer-input">練習分鐘</label>
+          <div class="timer-row">
+            <input
+              type="number"
+              id="timer-input"
+              class="timer-input"
+              min="0"
+              max="180"
+              step="1"
+              value="0"
+              inputmode="numeric"
+              placeholder="0"
+              aria-label="練習分鐘，0 為不限時"
+            >
+            <span class="timer-unit">分鐘</span>
+            <span id="timer-countdown" class="timer-countdown hidden" aria-live="polite"></span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="controls">
+      <button type="button" id="play-btn" class="ctrl-play" aria-label="開始">開始</button>
+    </footer>
+
+    <p id="wake-hint" class="wake-hint hidden">請保持螢幕亮著練習</p>
+  </div>
+
+  <div id="settings-backdrop" class="drawer-backdrop hidden" aria-hidden="true"></div>
+  <aside id="settings-drawer" class="settings-drawer" aria-hidden="true" aria-label="設定">
+    <div class="drawer-header">
+      <h2>設定</h2>
+      <button type="button" id="settings-close" class="drawer-close" aria-label="關閉設定">關閉</button>
+    </div>
+    <div class="drawer-body">
+      <section class="setting-section">
+        <h3>音色</h3>
+        <div class="seg-group" role="group" aria-label="音色">
+          <button type="button" class="seg-btn active" data-sound="wood">木質</button>
+          <button type="button" class="seg-btn" data-sound="electronic">電子</button>
+        </div>
+      </section>
+
+      <section class="setting-section">
+        <h3>外觀</h3>
+        <div class="seg-group" role="group" aria-label="主題">
+          <button type="button" class="seg-btn active" data-theme="day">日間</button>
+          <button type="button" class="seg-btn" data-theme="night">夜間</button>
+        </div>
+      </section>
+
+      <section class="setting-section">
+        <button type="button" id="show-tutorial" class="text-btn">再看安裝教學</button>
+      </section>
+    </div>
+  </aside>
+
+  <div id="tutorial-overlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+    <div class="tutorial-card">
+      <h2 id="tutorial-title">加到主畫面，使用更方便</h2>
+      <ol class="tutorial-steps">
+        <li>點瀏覽器下方的 <strong>分享</strong> 按鈕</li>
+        <li>選擇 <strong>加入主畫面</strong></li>
+        <li>從主畫面圖示開啟節拍器</li>
+      </ol>
+      <p class="tutorial-note">練習時請保持螢幕亮著，節拍與鐘擺才會持續運作。</p>
+      <button type="button" id="tutorial-dismiss" class="tutorial-dismiss">我知道了，開始使用</button>
+    </div>
+  </div>
+
+  <div id="practice-end" class="practice-end hidden" role="alert">
+    <p>練習結束</p>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
