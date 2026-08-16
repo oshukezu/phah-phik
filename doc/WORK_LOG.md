@@ -37,6 +37,7 @@
 | 小狗 v2 | 小森平 `maltese_dog4.mp3` 本地樣本（`dog-maltese.mp3`）+ 合成備援；`sw.js` v10 |
 | 雷射 | 小狗改雷射（`laser2.mp3`）；id `laser`；播放增益 +50%；`sw.js` v11 |
 | BPM 滾輪 | BPM 數字區支援滾輪 ±1（40–208），阻擋該區帶動頁面捲動 |
+| BPM 手勢 | 手機於 BPM 區上下滑 ±1（每 28px 一步）；`touch-action: none` |
 
 ### iOS 靜音鍵（平台限制）
 

@@ -21,6 +21,7 @@ import BeatArc from './BeatArc';
 import './Metronome.css';
 
 const PRESETS = ['2', '3', '4'];
+const BPM_SWIPE_STEP_PX = 28;
 
 export default function Metronome() {
   const { settings, save, clampBpm } = useSettingsState();
@@ -33,6 +34,9 @@ export default function Metronome() {
   const [showPreStartHint, setShowPreStartHint] = useState(false);
   const pendingStartRef = useRef(false);
   const bpmWrapRef = useRef(null);
+  const bpmRef = useRef(settings.bpm);
+  const touchLastStepYRef = useRef(0);
+  const touchActiveRef = useRef(false);
   const [bpmInput, setBpmInput] = useState(String(settings.bpm));
   const [timerMinInput, setTimerMinInput] = useState(
     settings.timerMinutes > 0 ? String(settings.timerMinutes) : ''
@@ -43,22 +47,64 @@ export default function Metronome() {
 
   const onBpmChange = useCallback((bpm) => {
     const v = clampBpm(bpm);
+    bpmRef.current = v;
     save({ bpm: v });
     setBpmInput(String(v));
   }, [save, clampBpm]);
 
   useEffect(() => {
+    bpmRef.current = settings.bpm;
+  }, [settings.bpm]);
+
+  useEffect(() => {
     const el = bpmWrapRef.current;
     if (!el) return;
+
+    const applyBpmStep = (step) => {
+      if (step === 0) return;
+      onBpmChange(bpmRef.current + step);
+    };
+
     const onWheel = (e) => {
       e.preventDefault();
       const step = e.deltaY < 0 ? 1 : e.deltaY > 0 ? -1 : 0;
-      if (step === 0) return;
-      onBpmChange(settings.bpm + step);
+      applyBpmStep(step);
     };
+
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 1) return;
+      touchActiveRef.current = true;
+      touchLastStepYRef.current = e.touches[0].clientY;
+    };
+
+    const onTouchMove = (e) => {
+      if (!touchActiveRef.current || e.touches.length !== 1) return;
+      const y = e.touches[0].clientY;
+      const delta = touchLastStepYRef.current - y;
+      const steps = Math.trunc(delta / BPM_SWIPE_STEP_PX);
+      if (steps === 0) return;
+      applyBpmStep(steps);
+      touchLastStepYRef.current = y;
+      e.preventDefault();
+    };
+
+    const onTouchEnd = () => {
+      touchActiveRef.current = false;
+    };
+
     el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [onBpmChange, settings.bpm]);
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('touchcancel', onTouchEnd);
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [onBpmChange]);
 
   const {
     isPlaying,

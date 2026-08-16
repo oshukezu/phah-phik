@@ -13,7 +13,7 @@ export default function TutorialOverlay({ open, onDismiss }) {
       <div className="tutorial-card">
         <h2 id="tutorial-title">使用教學</h2>
         <ol className="tutorial-steps">
-          <li>點上方的 BPM 數字調整，或在數字上滾動滑鼠滾輪增減</li>
+          <li>點上方的 BPM 數字調整；電腦可滾動滑鼠滾輪，手機可在數字上上下滑動增減</li>
           <li>選擇拍號，並設定練習時間（分與秒，皆為 0 則不限時）</li>
           <li>按 <strong>開始</strong> 練習，再按 <strong>停止</strong> 結束</li>
           {!standalone && (
