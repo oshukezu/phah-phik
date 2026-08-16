@@ -13,6 +13,7 @@ import {
 import { useWakeLock } from '../hooks/useWakeLock';
 import { usePracticeTimer } from '../hooks/usePracticeTimer';
 import { useTheme } from '../hooks/useTheme';
+import { useMediaQuery, SETTINGS_SHEET_QUERY } from '../hooks/useMediaQuery';
 import { isIOS } from '../utils/platform';
 import MoreSettings from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
@@ -211,9 +212,10 @@ export default function Metronome() {
   }, [save, start]);
 
   const manyDots = settings.beats > 8;
+  const settingsSheet = useMediaQuery(SETTINGS_SHEET_QUERY);
 
   return (
-    <div className={`metronome${moreOpen ? ' metronome-settings-open' : ''}`}>
+    <div className={`metronome${moreOpen && !settingsSheet ? ' metronome-settings-open' : ''}`}>
       {isBeatFlash && (
         <div
           key={beatTick}

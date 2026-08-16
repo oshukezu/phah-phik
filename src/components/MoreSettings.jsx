@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useMediaQuery, SETTINGS_SHEET_QUERY } from '../hooks/useMediaQuery';
 import './MoreSettings.css';
 
 const SOUND_OPTIONS = [
@@ -25,6 +27,110 @@ function Toggle({ label, pressed, onClick }) {
   );
 }
 
+function SettingsBody({
+  accentEnabled,
+  onAccentChange,
+  flashEnabled,
+  onFlashChange,
+  volumePercent,
+  onVolumeChange,
+  sound,
+  onSoundChange,
+  themeMode,
+  onThemeChange,
+  onShowTutorial,
+}) {
+  const handleVolumeChange = (e) => {
+    onVolumeChange(Number(e.target.value) / 100);
+  };
+
+  return (
+    <>
+      <div className="more-row">
+        <Toggle
+          label="重拍"
+          pressed={accentEnabled}
+          onClick={() => onAccentChange(!accentEnabled)}
+        />
+        <Toggle
+          label="節奏閃爍"
+          pressed={flashEnabled}
+          onClick={() => onFlashChange(!flashEnabled)}
+        />
+      </div>
+
+      <div className="more-group volume-group">
+        <div className="volume-header">
+          <span className="more-label">音量</span>
+          <span className="volume-value" aria-live="polite">{volumePercent}%</span>
+        </div>
+        <input
+          type="range"
+          className="volume-slider"
+          min={0}
+          max={100}
+          step={1}
+          value={volumePercent}
+          onChange={handleVolumeChange}
+          aria-label="音量"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={volumePercent}
+        />
+      </div>
+
+      <div className="more-group">
+        <span className="more-label">音色</span>
+        <div className="seg-group seg-sounds">
+          {SOUND_OPTIONS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              className={`seg-btn ${
+                sound === id ? (id === 'goose' ? 'active-goose' : 'active') : ''
+              }`}
+              onClick={() => onSoundChange(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="more-group">
+        <span className="more-label">外觀</span>
+        <div className="seg-group seg-theme">
+          <button
+            type="button"
+            className={`seg-btn ${themeMode === 'system' ? 'active' : ''}`}
+            onClick={() => onThemeChange('system')}
+          >
+            跟隨系統
+          </button>
+          <button
+            type="button"
+            className={`seg-btn ${themeMode === 'light' ? 'active' : ''}`}
+            onClick={() => onThemeChange('light')}
+          >
+            日間
+          </button>
+          <button
+            type="button"
+            className={`seg-btn ${themeMode === 'dark' ? 'active' : ''}`}
+            onClick={() => onThemeChange('dark')}
+          >
+            夜間
+          </button>
+        </div>
+      </div>
+
+      <button type="button" className="text-btn" onClick={onShowTutorial}>
+        再看使用教學
+      </button>
+    </>
+  );
+}
+
 export default function MoreSettings({
   open,
   onToggleOpen,
@@ -40,14 +146,44 @@ export default function MoreSettings({
   onThemeChange,
   onShowTutorial,
 }) {
+  const useSheet = useMediaQuery(SETTINGS_SHEET_QUERY);
+  const showSheet = open && useSheet;
   const volumePercent = Math.round(volume * 100);
 
-  const handleVolumeChange = (e) => {
-    onVolumeChange(Number(e.target.value) / 100);
+  const bodyProps = {
+    accentEnabled,
+    onAccentChange,
+    flashEnabled,
+    onFlashChange,
+    volumePercent,
+    onVolumeChange,
+    sound,
+    onSoundChange,
+    themeMode,
+    onThemeChange,
+    onShowTutorial,
   };
+
+  useEffect(() => {
+    if (!showSheet) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') onToggleOpen();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showSheet, onToggleOpen]);
 
   return (
     <section className="more-settings" aria-label="更多設定">
+      {showSheet && (
+        <button
+          type="button"
+          className="more-sheet-backdrop"
+          aria-label="關閉更多設定"
+          onClick={onToggleOpen}
+        />
+      )}
+
       <button
         type="button"
         className="more-toggle"
@@ -57,89 +193,24 @@ export default function MoreSettings({
         {open ? '▲ 收合更多設定' : '▼ 更多設定'}
       </button>
 
-      {open && (
+      {open && !useSheet && (
         <div className="more-body">
-          <div className="more-row">
-            <Toggle
-              label="重拍"
-              pressed={accentEnabled}
-              onClick={() => onAccentChange(!accentEnabled)}
-            />
-            <Toggle
-              label="節奏閃爍"
-              pressed={flashEnabled}
-              onClick={() => onFlashChange(!flashEnabled)}
-            />
-          </div>
+          <SettingsBody {...bodyProps} />
+        </div>
+      )}
 
-          <div className="more-group volume-group">
-            <div className="volume-header">
-              <span className="more-label">音量</span>
-              <span className="volume-value" aria-live="polite">{volumePercent}%</span>
-            </div>
-            <input
-              type="range"
-              className="volume-slider"
-              min={0}
-              max={100}
-              step={1}
-              value={volumePercent}
-              onChange={handleVolumeChange}
-              aria-label="音量"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={volumePercent}
-            />
+      {showSheet && (
+        <div
+          className="more-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="more-sheet-title"
+        >
+          <div className="more-sheet-handle" aria-hidden="true" />
+          <h2 id="more-sheet-title" className="more-sheet-title">更多設定</h2>
+          <div className="more-sheet-body">
+            <SettingsBody {...bodyProps} />
           </div>
-
-          <div className="more-group">
-            <span className="more-label">音色</span>
-            <div className="seg-group seg-sounds">
-              {SOUND_OPTIONS.map(({ id, label }) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`seg-btn ${
-                    sound === id ? (id === 'goose' ? 'active-goose' : 'active') : ''
-                  }`}
-                  onClick={() => onSoundChange(id)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="more-group">
-            <span className="more-label">外觀</span>
-            <div className="seg-group seg-theme">
-              <button
-                type="button"
-                className={`seg-btn ${themeMode === 'system' ? 'active' : ''}`}
-                onClick={() => onThemeChange('system')}
-              >
-                跟隨系統
-              </button>
-              <button
-                type="button"
-                className={`seg-btn ${themeMode === 'light' ? 'active' : ''}`}
-                onClick={() => onThemeChange('light')}
-              >
-                日間
-              </button>
-              <button
-                type="button"
-                className={`seg-btn ${themeMode === 'dark' ? 'active' : ''}`}
-                onClick={() => onThemeChange('dark')}
-              >
-                夜間
-              </button>
-            </div>
-          </div>
-
-          <button type="button" className="text-btn" onClick={onShowTutorial}>
-            再看使用教學
-          </button>
         </div>
       )}
     </section>
