@@ -40,6 +40,7 @@
 | BPM 手勢 | 手機於 BPM 區上下滑 ±1（每 28px 一步）；`touch-action: none` |
 | 詞源彈窗 | 底部「拍魄仔」連結；教育部辭典「拍拍」發音（`phah-phik-sutian.mp3`）；`sw.js` v12 |
 | 設定抽屜 | 小螢幕（max-height 720px）展開更多設定改底部抽屜，主區不再擠壓 |
+| 桌面設定 | 高視窗（min-height 721px）內嵌設定取消 vh 封頂與內捲，改整頁自然捲動 |
 
 ### iOS 靜音鍵（平台限制）
 

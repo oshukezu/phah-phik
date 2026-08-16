@@ -498,3 +498,15 @@
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+
+@media (min-height: 721px) {
+  .metronome-settings-open .metronome-main {
+    min-height: auto;
+    flex: 0 0 auto;
+  }
+
+  .metronome-settings-open .metronome-footer {
+    max-height: none;
+    flex: 0 0 auto;
+  }
+}

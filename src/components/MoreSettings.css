@@ -259,3 +259,23 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+@media (min-height: 721px) {
+  .more-settings {
+    overflow: visible;
+  }
+
+  .more-body {
+    max-height: none;
+    overflow-y: visible;
+    flex: 0 0 auto;
+  }
+
+  .more-row {
+    gap: 0.625rem;
+  }
+
+  .seg-sounds .seg-btn {
+    padding: 0.5rem 0.375rem;
+  }
+}
