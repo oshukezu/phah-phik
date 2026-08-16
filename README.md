@@ -48,7 +48,7 @@ npm run preview # 預覽 build 結果
 
 ## 音訊素材
 
-「鵝叫」音色裁切自 [Wiktionary zh-é.ogg](https://zh.wiktionary.org/zh-hant/File:zh-%C3%A9.ogg)（CC BY-SA 3.0，Yue Tan / [Shtooka Project](http://packs.shtooka.net/)）。
+「鵝叫」音色來自 Google 翻譯 TTS 中文「鵝」（建置時以 `npm run fetch-sounds` 擷取並打包，僅供個人專案使用）。
 
 ## 專案文件
 

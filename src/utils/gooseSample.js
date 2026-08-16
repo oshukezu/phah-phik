@@ -1,13 +1,13 @@
-const GOOSE_OFFSET_SEC = 0.1;
-const GOOSE_ACCENT_DURATION = 0.3;
-const GOOSE_WEAK_DURATION = 0.22;
-const GOOSE_ACCENT_RATE = 1.06;
-const GOOSE_WEAK_RATE = 1.0;
+const GOOSE_OFFSET_SEC = 0.05;
+const GOOSE_ACCENT_DURATION = 0.18;
+const GOOSE_WEAK_DURATION = 0.12;
+const GOOSE_ACCENT_RATE = 1.15;
+const GOOSE_WEAK_RATE = 1.1;
 
 let gooseBufferPromise = null;
 
 export function getGooseSampleUrl() {
-  return `${import.meta.env.BASE_URL}sounds/zh-e.ogg`;
+  return `${import.meta.env.BASE_URL}sounds/goose-zh-tw.mp3`;
 }
 
 export function loadGooseSample(audioContext) {
@@ -39,7 +39,7 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
   gain.connect(master);
   const audibleDuration = playDuration / playbackRate;
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.015);
+  gain.gain.linearRampToValueAtTime(peak, time + 0.008);
   gain.gain.exponentialRampToValueAtTime(0.001, time + audibleDuration);
 
   source.connect(gain);
@@ -48,9 +48,9 @@ export function playGooseFromSample(ctx, master, buffer, time, isAccent, peak) {
 }
 
 export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
-  const dur = isAccent ? 0.24 : 0.2;
-  const f0Start = isAccent ? 300 : 280;
-  const f0End = isAccent ? 520 : 480;
+  const dur = isAccent ? 0.16 : 0.12;
+  const f0Start = isAccent ? 320 : 300;
+  const f0End = isAccent ? 540 : 500;
 
   const osc = ctx.createOscillator();
   osc.type = 'sine';
@@ -59,13 +59,13 @@ export function playGooseSynthetic(ctx, master, time, isAccent, peak) {
 
   const formant = ctx.createBiquadFilter();
   formant.type = 'bandpass';
-  formant.frequency.setValueAtTime(600, time);
+  formant.frequency.setValueAtTime(650, time);
   formant.Q.setValueAtTime(2.5, time);
 
   const gain = ctx.createGain();
   gain.connect(master);
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peak, time + 0.02);
+  gain.gain.linearRampToValueAtTime(peak, time + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
 
   osc.connect(formant);

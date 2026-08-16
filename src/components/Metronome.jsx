@@ -191,7 +191,7 @@ export default function Metronome() {
   const manyDots = settings.beats > 8;
 
   return (
-    <div className="metronome">
+    <div className={`metronome${moreOpen ? ' metronome-settings-open' : ''}`}>
       {isBeatFlash && (
         <div
           key={beatTick}
