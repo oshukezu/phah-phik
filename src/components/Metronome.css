@@ -388,9 +388,20 @@
   background: var(--accent-secondary);
 }
 
-.wake-hint {
+.wake-hint,
+.playback-hints {
   margin: 0;
   text-align: center;
+}
+
+.playback-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.playback-hint {
+  margin: 0;
   font-size: 0.875rem;
   color: var(--text-muted);
 }

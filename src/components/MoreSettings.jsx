@@ -39,6 +39,7 @@ export default function MoreSettings({
   themeMode,
   onThemeChange,
   onShowTutorial,
+  onPreviewSound,
 }) {
   const volumePercent = Math.round(volume * 100);
 
@@ -91,6 +92,10 @@ export default function MoreSettings({
               aria-valuenow={volumePercent}
             />
           </div>
+
+          <button type="button" className="text-btn" onClick={onPreviewSound}>
+            試聽一下
+          </button>
 
           <div className="more-group">
             <span className="more-label">音色</span>

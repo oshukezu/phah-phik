@@ -22,8 +22,15 @@
 | 文件 | README、本結構說明、工作日誌 |
 | BeatArc | BPM 上方半圓弧節拍圖（試作） |
 | BeatArc 修正 | 加寬弧線、修正 viewBox 裁切；單一圓點連續滑動；淡色單色階（指示點比弧線略深） |
-| 音色 | 底鼓改為鵝叫（`goose`）；`kick` 設定自動遷移；鵝叫改為國語「é」母音二聲合成 |
+| 音色 | 底鼓改為鵝叫（`goose`）；`kick` 設定自動遷移；鵝叫改為 F0 陽平 + F1/F2 母音合成 |
 | 圖示 | 主畫面／PWA：`metronome.png`；瀏覽器分頁 favicon：`duck-face.png` |
+| iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume`；更多設定「試聽一下」 |
+
+### iOS 靜音鍵（平台限制）
+
+- iPhone 側邊靜音鍵 ON 時，PWA／Web Audio **無法**讓內建喇叭出聲（Apple 設計限制）
+- 解法：引導使用者關閉靜音鍵、接耳機，或開始播放後調媒體音量
+- 原生 App（Capacitor + `AVAudioSession`）才可能突破，本次不納入
 
 ### 程式碼健康
 

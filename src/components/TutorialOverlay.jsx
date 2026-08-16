@@ -1,10 +1,12 @@
 import { isStandalone } from '../hooks/useSettings';
+import { isIOS } from '../utils/platform';
 import './TutorialOverlay.css';
 
 export default function TutorialOverlay({ open, onDismiss }) {
   if (!open) return null;
 
   const standalone = isStandalone();
+  const ios = isIOS();
 
   return (
     <div className="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
@@ -16,6 +18,12 @@ export default function TutorialOverlay({ open, onDismiss }) {
           <li>按 <strong>開始</strong> 練習，再按 <strong>停止</strong> 結束</li>
           {!standalone && (
             <li>加到主畫面：點瀏覽器 <strong>分享</strong> → <strong>加入主畫面</strong></li>
+          )}
+          {ios && (
+            <li>
+              iPhone 聽不到聲音？請關閉側邊<strong>靜音鍵</strong>（橘色不可見），
+              或接上<strong>耳機／藍牙</strong>；開始播放後再按音量鍵確認<strong>媒體音量</strong>
+            </li>
           )}
         </ol>
         <p className="tutorial-note">練習時請保持螢幕亮著，節拍才會持續運作。</p>

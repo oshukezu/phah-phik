@@ -127,32 +127,70 @@ export function useMetronome({
 
   const playGoose = useCallback((ctx, master, time, isAccent) => {
     const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
-    const dur = 0.11;
-    const startFreq = isAccent ? 330 : 300;
-    const endFreq = isAccent ? 500 : 460;
-
-    const gain = ctx.createGain();
-    gain.connect(master);
+    const dur = isAccent ? 0.12 : 0.11;
+    const f0Start = isAccent ? 240 : 220;
+    const f0Mid = isAccent ? 300 : 275;
+    const f0End = isAccent ? 400 : 360;
+    const midAt = time + dur * 0.42;
 
     const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(startFreq, time);
-    osc.frequency.linearRampToValueAtTime(endFreq, time + dur);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(f0Start, time);
+    osc.frequency.exponentialRampToValueAtTime(f0Mid, midAt);
+    osc.frequency.exponentialRampToValueAtTime(f0End, time + dur);
 
-    const formant = ctx.createBiquadFilter();
-    formant.type = 'peaking';
-    formant.frequency.setValueAtTime(isAccent ? 560 : 520, time);
-    formant.Q.setValueAtTime(2.5, time);
-    formant.gain.setValueAtTime(5, time);
+    const f1 = ctx.createBiquadFilter();
+    f1.type = 'bandpass';
+    f1.frequency.setValueAtTime(480, time);
+    f1.Q.setValueAtTime(4, time);
 
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(peak * 0.9, time + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    const f2 = ctx.createBiquadFilter();
+    f2.type = 'bandpass';
+    f2.frequency.setValueAtTime(1750, time);
+    f2.Q.setValueAtTime(6, time);
 
-    osc.connect(formant);
-    formant.connect(gain);
+    const env = ctx.createGain();
+    env.connect(master);
+    env.gain.setValueAtTime(0, time);
+    env.gain.linearRampToValueAtTime(1, time + 0.01);
+    env.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    const gainF1 = ctx.createGain();
+    gainF1.gain.setValueAtTime(peak * 0.72, time);
+    const gainF2 = ctx.createGain();
+    gainF2.gain.setValueAtTime(peak * 0.28, time);
+
+    osc.connect(f1);
+    f1.connect(gainF1);
+    gainF1.connect(env);
+    osc.connect(f2);
+    f2.connect(gainF2);
+    gainF2.connect(env);
+
+    const noiseLen = Math.floor(ctx.sampleRate * 0.012);
+    const buffer = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < noiseLen; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (noiseLen * 0.18));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(1200, time);
+    noiseFilter.Q.setValueAtTime(1.2, time);
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0, time);
+    noiseGain.gain.linearRampToValueAtTime(peak * 0.07, time + 0.004);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.022);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(env);
+
     osc.start(time);
-    osc.stop(time + dur + 0.015);
+    osc.stop(time + dur + 0.02);
+    noise.start(time);
+    noise.stop(time + 0.025);
   }, []);
 
   const playBoing = useCallback((ctx, master, time, isAccent) => {
@@ -310,6 +348,20 @@ export function useMetronome({
     displayedBeatRef.current = -1;
   }, []);
 
+  const setMediaSessionPlaying = useCallback(() => {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: '拍魄仔',
+      artist: '練習中',
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  }, []);
+
+  const setMediaSessionPaused = useCallback(() => {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.playbackState = 'paused';
+  }, []);
+
   const startInternal = useCallback(async () => {
     const ctx = initAudioContext();
     if (ctx.state === 'suspended') await ctx.resume();
@@ -338,7 +390,8 @@ export function useMetronome({
   const start = useCallback(() => {
     setIsPlaying(true);
     startInternal();
-  }, [startInternal]);
+    setMediaSessionPlaying();
+  }, [startInternal, setMediaSessionPlaying]);
 
   const stop = useCallback(() => {
     stopSchedulers();
@@ -349,7 +402,27 @@ export function useMetronome({
     setIsPlaying(false);
     setCurrentBeat(0);
     setBeatProgress(0);
-  }, [stopSchedulers]);
+    setMediaSessionPaused();
+  }, [stopSchedulers, setMediaSessionPaused]);
+
+  const previewSound = useCallback(async () => {
+    const ctx = initAudioContext();
+    if (ctx.state === 'suspended') await ctx.resume();
+
+    const hadMaster = Boolean(masterGainRef.current);
+    if (!hadMaster) createMasterGain();
+
+    playSoundRef.current(ctx.currentTime, true);
+
+    if (!hadMaster && !isRunningRef.current) {
+      setTimeout(() => {
+        if (!isRunningRef.current && masterGainRef.current) {
+          masterGainRef.current.disconnect();
+          masterGainRef.current = null;
+        }
+      }, 500);
+    }
+  }, [initAudioContext, createMasterGain]);
 
   useEffect(() => {
     if (isRunningRef.current) {
@@ -367,10 +440,28 @@ export function useMetronome({
     onBpmChange(clampBpm(value));
   }, [onBpmChange]);
 
+  useEffect(() => {
+    const onVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible' || !isRunningRef.current) return;
+      const ctx = audioContextRef.current;
+      if (ctx?.state === 'suspended') {
+        try {
+          await ctx.resume();
+        } catch {
+          // ignore resume failures
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
+
   useEffect(() => () => {
     stopSchedulers();
     if (masterGainRef.current) masterGainRef.current.disconnect();
-  }, [stopSchedulers]);
+    setMediaSessionPaused();
+  }, [stopSchedulers, setMediaSessionPaused]);
 
   return {
     isPlaying,
@@ -382,5 +473,6 @@ export function useMetronome({
     stop,
     setBpm,
     clampBpm,
+    previewSound,
   };
 }

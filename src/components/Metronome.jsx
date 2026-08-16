@@ -13,6 +13,7 @@ import {
 import { useWakeLock } from '../hooks/useWakeLock';
 import { usePracticeTimer } from '../hooks/usePracticeTimer';
 import { useTheme } from '../hooks/useTheme';
+import { isIOS } from '../utils/platform';
 import MoreSettings from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
 import BeatArc from './BeatArc';
@@ -49,6 +50,7 @@ export default function Metronome() {
     beatProgress,
     toggle,
     stop,
+    previewSound,
     clampBpm: clampBpmEngine,
   } = useMetronome({
     bpm: settings.bpm,
@@ -60,6 +62,8 @@ export default function Metronome() {
   });
 
   const { hasSupport: hasWakeLock } = useWakeLock(isPlaying);
+  const showIosSoundHint = isIOS() && isPlaying;
+  const showWakeHint = !hasWakeLock && isPlaying;
 
   const onTimerComplete = useCallback(() => {
     stop();
@@ -310,13 +314,21 @@ export default function Metronome() {
           themeMode={themeMode}
           onThemeChange={setTheme}
           onShowTutorial={() => setShowTutorial(true)}
+          onPreviewSound={previewSound}
         />
 
         <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
       </div>
 
-      {!hasWakeLock && isPlaying && (
-        <p className="wake-hint">請保持螢幕亮著練習</p>
+      {(showIosSoundHint || showWakeHint) && (
+        <div className="playback-hints">
+          {showIosSoundHint && (
+            <p className="playback-hint">聽不到聲音？請關閉靜音鍵或接耳機</p>
+          )}
+          {showWakeHint && (
+            <p className="playback-hint">請保持螢幕亮著練習</p>
+          )}
+        </div>
       )}
 
       {practiceEnd && (
