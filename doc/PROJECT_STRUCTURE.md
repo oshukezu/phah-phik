@@ -13,6 +13,9 @@ Codex/Metronome/
 │   ├── manifest.webmanifest  # PWA 清單
 │   ├── sw.js                 # Service Worker
 │   └── icons/
+│       ├── metronome.png     # PWA／主畫面圖示
+│       ├── duck-face.png     # 瀏覽器分頁 favicon
+│       └── icon.svg          # 舊圖示（備份）
 ├── src/
 │   ├── main.jsx              # React 進入點
 │   ├── App.jsx

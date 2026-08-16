@@ -1,5 +1,11 @@
-const CACHE = 'elder-metronome-v5';
-const ASSETS = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg'];
+const CACHE = 'elder-metronome-v7';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icons/metronome.png',
+  './icons/duck-face.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));

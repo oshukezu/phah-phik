@@ -97,6 +97,15 @@ export default function Metronome() {
     setTimerSecInput(seconds > 0 ? String(seconds) : '');
   };
 
+  const handleClearTimer = () => {
+    save({ timerMinutes: 0, timerSeconds: 0 });
+    setTimerMinInput('');
+    setTimerSecInput('');
+  };
+
+  const isUnlimited =
+    settings.timerMinutes === 0 && settings.timerSeconds === 0;
+
   const applyPreset = (preset) => {
     if (preset === 'custom') {
       save({ timeSigMode: 'custom' });
@@ -260,6 +269,14 @@ export default function Metronome() {
               onBlur={handleTimerBlur}
             />
             <span className="timer-unit">秒</span>
+            <button
+              type="button"
+              className={`timer-unlimited-btn ${isUnlimited ? 'active' : ''}`}
+              onClick={handleClearTimer}
+              aria-pressed={isUnlimited}
+            >
+              不限時
+            </button>
             {hasTimer && (
               <span className="timer-countdown" aria-live="polite">{timerDisplay}</span>
             )}

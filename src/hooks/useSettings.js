@@ -16,7 +16,7 @@ const DEFAULTS = {
   tutorialDismissed: false,
 };
 
-const VALID_SOUNDS = ['wood', 'electronic', 'kick', 'boing', 'bell', 'frog'];
+const VALID_SOUNDS = ['wood', 'electronic', 'goose', 'boing', 'bell', 'frog'];
 
 const VALID_NOTE_VALUES = [2, 4, 8];
 
@@ -80,6 +80,7 @@ export function loadRaw() {
     parsed.timerSeconds = clampTimerSeconds(parsed.timerSeconds ?? 0);
     parsed.volume = clampVolume(parsed.volume ?? 0.6);
     if (parsed.sound === 'click') parsed.sound = 'boing';
+    if (parsed.sound === 'kick') parsed.sound = 'goose';
     parsed.sound = VALID_SOUNDS.includes(parsed.sound) ? parsed.sound : 'wood';
     parsed.accentEnabled = parsed.accentEnabled !== false;
     parsed.flashEnabled = parsed.flashEnabled === true;

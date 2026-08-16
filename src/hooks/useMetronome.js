@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 export const SOUND_TYPES = {
   wood: { name: '木質' },
   electronic: { name: '電子' },
-  kick: { name: '底鼓' },
+  goose: { name: '鵝叫' },
   boing: { name: '彈簧' },
   bell: { name: '清脆' },
   frog: { name: '蛙鳴' },
@@ -125,20 +125,34 @@ export function useMetronome({
     osc.stop(time + 0.09);
   }, []);
 
-  const playKick = useCallback((ctx, master, time, isAccent) => {
+  const playGoose = useCallback((ctx, master, time, isAccent) => {
+    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const dur = 0.11;
+    const startFreq = isAccent ? 330 : 300;
+    const endFreq = isAccent ? 500 : 460;
+
     const gain = ctx.createGain();
     gain.connect(master);
-    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+
     const osc = ctx.createOscillator();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(isAccent ? 150 : 120, time);
-    osc.frequency.exponentialRampToValueAtTime(40, time + 0.08);
+    osc.frequency.setValueAtTime(startFreq, time);
+    osc.frequency.linearRampToValueAtTime(endFreq, time + dur);
+
+    const formant = ctx.createBiquadFilter();
+    formant.type = 'peaking';
+    formant.frequency.setValueAtTime(isAccent ? 560 : 520, time);
+    formant.Q.setValueAtTime(2.5, time);
+    formant.gain.setValueAtTime(5, time);
+
     gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(peak * 1.2, time + 0.002);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
-    osc.connect(gain);
+    gain.gain.linearRampToValueAtTime(peak * 0.9, time + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    osc.connect(formant);
+    formant.connect(gain);
     osc.start(time);
-    osc.stop(time + 0.13);
+    osc.stop(time + dur + 0.015);
   }, []);
 
   const playBoing = useCallback((ctx, master, time, isAccent) => {
@@ -204,8 +218,8 @@ export function useMetronome({
       case 'electronic':
         playElectronic(ctx, master, time, isAccent);
         break;
-      case 'kick':
-        playKick(ctx, master, time, isAccent);
+      case 'goose':
+        playGoose(ctx, master, time, isAccent);
         break;
       case 'boing':
         playBoing(ctx, master, time, isAccent);
@@ -219,7 +233,7 @@ export function useMetronome({
       default:
         playWood(ctx, master, time, isAccent);
     }
-  }, [playElectronic, playKick, playBoing, playBell, playFrog, playWood]);
+  }, [playElectronic, playGoose, playBoing, playBell, playFrog, playWood]);
 
   useEffect(() => {
     playSoundRef.current = playSound;
