@@ -42,13 +42,16 @@ npm run preview # 預覽 build 結果
 ## 技術棧
 
 - React 19 + Vite 7
-- Web Audio API（音色合成；鵝叫使用授權樣本 + 合成備援）
+- Web Audio API（音色合成；小狗、鵝叫使用本地樣本 + 合成備援）
 - localStorage（設定持久化）
 - PWA（`manifest.webmanifest` + Service Worker）
 
 ## 音訊素材
 
-「鵝叫」音色來自 Google 翻譯 TTS 中文「鵝」（建置時以 `npm run fetch-sounds` 擷取並打包，僅供個人專案使用）。
+建置時以 `npm run fetch-sounds` 下載並打包至 `public/sounds/`（僅供個人專案使用）：
+
+- **鵝叫**：Google 翻譯 TTS 中文「鵝」
+- **小狗**：[小森平 免費音效](https://taira-komori.net/) `maltese_dog4.mp3`
 
 ## 專案文件
 
