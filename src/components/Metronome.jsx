@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMetronome } from '../hooks/useMetronome';
 import {
   useSettingsState,
@@ -32,6 +32,7 @@ export default function Metronome() {
   const [practiceEnd, setPracticeEnd] = useState(false);
   const [showPreStartHint, setShowPreStartHint] = useState(false);
   const pendingStartRef = useRef(false);
+  const bpmWrapRef = useRef(null);
   const [bpmInput, setBpmInput] = useState(String(settings.bpm));
   const [timerMinInput, setTimerMinInput] = useState(
     settings.timerMinutes > 0 ? String(settings.timerMinutes) : ''
@@ -45,6 +46,19 @@ export default function Metronome() {
     save({ bpm: v });
     setBpmInput(String(v));
   }, [save, clampBpm]);
+
+  useEffect(() => {
+    const el = bpmWrapRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const step = e.deltaY < 0 ? 1 : e.deltaY > 0 ? -1 : 0;
+      if (step === 0) return;
+      onBpmChange(settings.bpm + step);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [onBpmChange, settings.bpm]);
 
   const {
     isPlaying,
@@ -176,7 +190,7 @@ export default function Metronome() {
                 beatProgress={beatProgress}
                 isPlaying={isPlaying}
               />
-              <label className="bpm-input-wrap" htmlFor="bpm-input">
+              <label className="bpm-input-wrap" htmlFor="bpm-input" ref={bpmWrapRef}>
               <input
                 id="bpm-input"
                 type="text"
