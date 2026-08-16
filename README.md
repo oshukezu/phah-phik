@@ -1,12 +1,10 @@
 # 拍魄仔（Pop-Pick）
 
-極簡網頁節拍器：大字 BPM、大按鈕、設定收在「更多設定」，支援 PWA 加到主畫面。
-
-拍魄仔 Developed by J.J. Wang
+打節拍在台語裡叫做「拍拍」phah-phik，願你在音符鋪成的征途上，都能勇敢當一個不畏挫折、堅定信念的「拍魄仔」，用自己的節奏，拍出靈魂深處最磅礡的熱情與力量。
 
 ## 功能特色
 
-- **超大 BPM**：點數字即可調整每分鐘拍數（40–208）
+- **超大 BPM**：點數字即可調整每分鐘拍數（40–208），支援滾動調整
 - **拍號**：2/4、3/4、4/4 或自訂（1–16 拍）
 - **練習計時**：分＋秒，倒數結束自動停止；可按「不限時」一鍵歸零無限播放
 - **六種音色**：木質、電子、清脆、雷射、蛙鳴、鵝叫
@@ -16,36 +14,6 @@
 - **設定記憶**：同一瀏覽器重開後保留上次設定
 - **播放中可調**：開始後仍可改 BPM、拍號、音色等
 
-## 本機開發
-
-```bash
-npm ci
-npm run dev
-```
-
-瀏覽器開啟 http://127.0.0.1:5173/
-
-```bash
-npm run lint    # ESLint
-npm run build   # 產出 dist/
-npm run preview # 預覽 build 結果
-```
-
-## 部署（GitHub Pages）
-
-正式網址：https://oshukezu.github.io/phah-phik/
-
-推送到 `main` 分支後，[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) 會自動建置並部署 `dist/`。
-
-首次使用請在 GitHub 倉庫 **Settings → Pages** 將 Source 設為 **GitHub Actions**。
-
-## 技術棧
-
-- React 19 + Vite 7
-- Web Audio API（音色合成；雷射、鵝叫使用本地樣本 + 合成備援）
-- localStorage（設定持久化）
-- PWA（`manifest.webmanifest` + Service Worker）
-
 ## 音訊素材
 
 建置時以 `npm run fetch-sounds` 下載並打包至 `public/sounds/`（僅供個人專案使用）：
@@ -54,11 +22,7 @@ npm run preview # 預覽 build 結果
 - **雷射**：[小森平 免費音效](https://taira-komori.net/) `laser2.mp3`（播放增益 +50%）
 - **拍魄仔發音**：[教育部臺灣台語常用詞辭典](https://sutian.moe.edu.tw/zh-hant/su/4034/)「拍拍」詞目音檔
 
-## 專案文件
-
-- [檔案結構](doc/PROJECT_STRUCTURE.md)
-- [工作日誌](doc/WORK_LOG.md)
-
 ## 授權
 
-Private project — 僅供個人／授權使用。
+Private project 僅供個人／授權使用。
+拍魄仔 Developed by J.J. Wang
