@@ -136,6 +136,12 @@
   font-size: 0.8125rem;
 }
 
+.seg-sounds .seg-btn.active-goose {
+  background: #f0c419;
+  border-color: #d9ad10;
+  color: #1a1a2e;
+}
+
 .toggle-btn {
   display: flex;
   align-items: center;

@@ -17,7 +17,7 @@ const DEFAULTS = {
   iosMuteHintSeen: false,
 };
 
-const VALID_SOUNDS = ['wood', 'electronic', 'goose', 'boing', 'bell', 'frog'];
+const VALID_SOUNDS = ['wood', 'electronic', 'goose', 'dog', 'bell', 'frog'];
 
 const VALID_NOTE_VALUES = [2, 4, 8];
 
@@ -82,6 +82,7 @@ export function loadRaw() {
     parsed.volume = clampVolume(parsed.volume ?? 0.6);
     if (parsed.sound === 'click') parsed.sound = 'boing';
     if (parsed.sound === 'kick') parsed.sound = 'goose';
+    if (parsed.sound === 'boing') parsed.sound = 'dog';
     parsed.sound = VALID_SOUNDS.includes(parsed.sound) ? parsed.sound : 'wood';
     parsed.accentEnabled = parsed.accentEnabled !== false;
     parsed.flashEnabled = parsed.flashEnabled === true;

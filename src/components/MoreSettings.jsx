@@ -4,9 +4,9 @@ const SOUND_OPTIONS = [
   { id: 'wood', label: '木質' },
   { id: 'electronic', label: '電子' },
   { id: 'bell', label: '清脆' },
-  { id: 'goose', label: '鵝叫' },
-  { id: 'boing', label: '彈簧' },
+  { id: 'dog', label: '小狗' },
   { id: 'frog', label: '蛙鳴' },
+  { id: 'goose', label: '鵝叫' },
 ];
 
 function Toggle({ label, pressed, onClick }) {
@@ -99,7 +99,9 @@ export default function MoreSettings({
                 <button
                   key={id}
                   type="button"
-                  className={`seg-btn ${sound === id ? 'active' : ''}`}
+                  className={`seg-btn ${
+                    sound === id ? (id === 'goose' ? 'active-goose' : 'active') : ''
+                  }`}
                   onClick={() => onSoundChange(id)}
                 >
                   {label}

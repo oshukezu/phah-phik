@@ -10,7 +10,7 @@ export const SOUND_TYPES = {
   wood: { name: '木質' },
   electronic: { name: '電子' },
   goose: { name: '鵝叫' },
-  boing: { name: '彈簧' },
+  dog: { name: '小狗' },
   bell: { name: '清脆' },
   frog: { name: '蛙鳴' },
 };
@@ -149,20 +149,47 @@ export function useMetronome({
     playGooseSynthetic(ctx, master, time, isAccent, peak);
   }, []);
 
-  const playBoing = useCallback((ctx, master, time, isAccent) => {
-    const gain = ctx.createGain();
-    gain.connect(master);
+  const playDog = useCallback((ctx, master, time, isAccent) => {
     const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const dur = isAccent ? 0.11 : 0.09;
+
+    const bufferSize = Math.floor(ctx.sampleRate * dur);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      const env = Math.exp(-i / (bufferSize * 0.22));
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(isAccent ? 720 : 620, time);
+    filter.Q.setValueAtTime(1.4, time);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.connect(master);
+    noiseGain.gain.setValueAtTime(0, time);
+    noiseGain.gain.linearRampToValueAtTime(peak * 0.85, time + 0.004);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noise.start(time);
+    noise.stop(time + dur + 0.01);
+
+    const toneGain = ctx.createGain();
+    toneGain.connect(master);
     const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(isAccent ? 400 : 320, time);
-    osc.frequency.exponentialRampToValueAtTime(80, time + 0.15);
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(peak, time + 0.005);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
-    osc.connect(gain);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(isAccent ? 280 : 240, time);
+    osc.frequency.exponentialRampToValueAtTime(120, time + dur * 0.85);
+    toneGain.gain.setValueAtTime(0, time);
+    toneGain.gain.linearRampToValueAtTime(peak * 0.35, time + 0.003);
+    toneGain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    osc.connect(toneGain);
     osc.start(time);
-    osc.stop(time + 0.21);
+    osc.stop(time + dur + 0.01);
   }, []);
 
   const playBell = useCallback((ctx, master, time, isAccent) => {
@@ -215,8 +242,8 @@ export function useMetronome({
       case 'goose':
         playGoose(ctx, master, time, isAccent);
         break;
-      case 'boing':
-        playBoing(ctx, master, time, isAccent);
+      case 'dog':
+        playDog(ctx, master, time, isAccent);
         break;
       case 'bell':
         playBell(ctx, master, time, isAccent);
@@ -227,7 +254,7 @@ export function useMetronome({
       default:
         playWood(ctx, master, time, isAccent);
     }
-  }, [playElectronic, playGoose, playBoing, playBell, playFrog, playWood]);
+  }, [playElectronic, playGoose, playDog, playBell, playFrog, playWood]);
 
   useEffect(() => {
     playSoundRef.current = playSound;
