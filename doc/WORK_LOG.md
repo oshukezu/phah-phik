@@ -44,6 +44,7 @@
 | 桌面右側欄 | 寬螢幕（min-width 768px）展開設定改右側 sticky 欄，主區維持左欄 |
 | 大螢幕間距 | 桌面（768px+）左欄主區取消 58vh 鎖高、加大 gap；右欄設定內部間距放寬 |
 | 開始鈕間距 | 開始 zone 上下 margin；內嵌設定展開時主區改 flex-start，不縮按鈕高度 |
+| 主區行距 | 主區 flex-start + gap 改為預設，收合設定後不再縮回 space-evenly／58vh |
 | 鵝叫增益 | `gooseSample.js` 播放增益 +50%（`GOOSE_GAIN_BOOST = 1.5`） |
 
 ### iOS 靜音鍵（平台限制）

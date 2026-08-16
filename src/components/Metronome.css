@@ -101,8 +101,9 @@
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  min-height: min(58vh, 32rem);
+  justify-content: flex-start;
+  gap: 1rem;
+  min-height: auto;
 }
 
 .metronome-zone {
@@ -117,18 +118,6 @@
 }
 
 .metronome-zone-play {
-  margin-top: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.metronome-settings-open .metronome-main {
-  flex: 1 0 auto;
-  justify-content: flex-start;
-  gap: 1rem;
-  min-height: min(58vh, 32rem);
-}
-
-.metronome-settings-open .metronome-zone-play {
   margin-top: 0.75rem;
   margin-bottom: 1rem;
 }
@@ -511,11 +500,6 @@
 }
 
 @media (min-height: 721px) {
-  .metronome-settings-open .metronome-main {
-    min-height: auto;
-    flex: 0 0 auto;
-  }
-
   .metronome-settings-open .metronome-footer {
     max-height: none;
     flex: 0 0 auto;
