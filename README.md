@@ -17,8 +17,6 @@
 
 ## 音訊素材
 
-建置時以 `npm run fetch-sounds` 下載並打包至 `public/sounds/`（僅供個人專案使用）：
-
 - **鵝叫**：Google 翻譯 TTS 中文「鵝」
 - **雷射**：[小森平 免費音效](https://taira-komori.net/) `laser2.mp3`（播放增益 +50%）
 - **拍魄仔發音**：[教育部臺灣台語常用詞辭典](https://sutian.moe.edu.tw/zh-hant/su/4034/)「拍拍」詞目音檔
