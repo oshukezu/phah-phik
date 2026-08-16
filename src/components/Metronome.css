@@ -105,12 +105,6 @@
   min-height: min(58vh, 32rem);
 }
 
-.metronome-settings-open .metronome-main {
-  flex: 1 0 auto;
-  justify-content: space-evenly;
-  min-height: min(58vh, 32rem);
-}
-
 .metronome-zone {
   flex-shrink: 0;
   display: flex;
@@ -120,6 +114,23 @@
 
 .metronome-zone-bpm {
   gap: 0.75rem;
+}
+
+.metronome-zone-play {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.metronome-settings-open .metronome-main {
+  flex: 1 0 auto;
+  justify-content: flex-start;
+  gap: 1rem;
+  min-height: min(58vh, 32rem);
+}
+
+.metronome-settings-open .metronome-zone-play {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .metronome-footer {
@@ -512,6 +523,35 @@
 }
 
 @media (min-width: 768px) {
+  .metronome {
+    gap: 0.75rem;
+    padding-top: calc(1.5rem + var(--safe-top));
+    padding-bottom: calc(2rem + var(--safe-bottom));
+  }
+
+  .metronome-main {
+    min-height: auto;
+    justify-content: flex-start;
+    gap: 1.25rem;
+  }
+
+  .metronome-zone-bpm {
+    gap: 1rem;
+  }
+
+  .home-panel {
+    gap: 1.25rem;
+  }
+
+  .metronome-footer {
+    gap: 0.75rem;
+  }
+
+  .metronome-zone-play {
+    margin-top: 0.375rem;
+    margin-bottom: 0.5rem;
+  }
+
   .metronome-layout {
     display: grid;
     grid-template-columns: minmax(0, 28rem);
@@ -527,6 +567,9 @@
   }
 
   .metronome-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     min-width: 0;
   }
 }
