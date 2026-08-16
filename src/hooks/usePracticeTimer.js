@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-export function usePracticeTimer(isPlaying, timerMinutes, onComplete) {
+export function usePracticeTimer(isPlaying, timerMinutes, timerSeconds, onComplete) {
   const [remaining, setRemaining] = useState(null);
   const endAtRef = useRef(null);
   const rafRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
+
+  const totalSeconds = timerMinutes * 60 + timerSeconds;
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -19,12 +21,12 @@ export function usePracticeTimer(isPlaying, timerMinutes, onComplete) {
   }, []);
 
   useEffect(() => {
-    if (!isPlaying || timerMinutes <= 0) {
+    if (!isPlaying || totalSeconds <= 0) {
       clearTimer();
       return () => setRemaining(null);
     }
 
-    endAtRef.current = Date.now() + timerMinutes * 60 * 1000;
+    endAtRef.current = Date.now() + totalSeconds * 1000;
 
     const tick = () => {
       if (!endAtRef.current) return;
@@ -43,7 +45,7 @@ export function usePracticeTimer(isPlaying, timerMinutes, onComplete) {
       clearTimer();
       setRemaining(null);
     };
-  }, [isPlaying, timerMinutes, clearTimer]);
+  }, [isPlaying, totalSeconds, clearTimer]);
 
   const formatRemaining = () => {
     if (remaining == null) return '';
@@ -53,7 +55,7 @@ export function usePracticeTimer(isPlaying, timerMinutes, onComplete) {
   };
 
   return {
-    hasTimer: isPlaying && timerMinutes > 0 && remaining != null,
+    hasTimer: isPlaying && totalSeconds > 0 && remaining != null,
     display: formatRemaining(),
   };
 }

@@ -11,8 +11,12 @@ const DEFAULTS = {
   accentEnabled: true,
   flashEnabled: false,
   timerMinutes: 0,
+  timerSeconds: 0,
+  volume: 0.6,
   tutorialDismissed: false,
 };
+
+const VALID_SOUNDS = ['wood', 'electronic', 'kick', 'boing', 'bell', 'frog'];
 
 const VALID_NOTE_VALUES = [2, 4, 8];
 
@@ -22,6 +26,16 @@ function clampBpm(bpm) {
 
 function clampTimer(minutes) {
   return Math.min(180, Math.max(0, Math.round(minutes)));
+}
+
+function clampTimerSeconds(seconds) {
+  return Math.min(59, Math.max(0, Math.round(seconds)));
+}
+
+function clampVolume(volume) {
+  const v = Number(volume);
+  if (!Number.isFinite(v)) return 0.6;
+  return Math.round(Math.min(1, Math.max(0, v)) * 100) / 100;
 }
 
 function clampBeats(beats) {
@@ -53,7 +67,6 @@ export function loadRaw() {
       parsed.timeSigMode = String(parsed.timeSignature);
     }
 
-    delete parsed.volume;
     delete parsed.customColors;
     delete parsed.timeSignature;
     delete parsed.theme;
@@ -64,7 +77,10 @@ export function loadRaw() {
     parsed.noteValue = clampNoteValue(parsed.noteValue);
     parsed.timeSigMode = normalizeTimeSigMode(parsed);
     parsed.timerMinutes = clampTimer(parsed.timerMinutes);
-    parsed.sound = parsed.sound === 'electronic' ? 'electronic' : 'wood';
+    parsed.timerSeconds = clampTimerSeconds(parsed.timerSeconds ?? 0);
+    parsed.volume = clampVolume(parsed.volume ?? 0.6);
+    if (parsed.sound === 'click') parsed.sound = 'boing';
+    parsed.sound = VALID_SOUNDS.includes(parsed.sound) ? parsed.sound : 'wood';
     parsed.accentEnabled = parsed.accentEnabled !== false;
     parsed.flashEnabled = parsed.flashEnabled === true;
 
@@ -92,7 +108,7 @@ export function useSettingsState() {
     });
   }, []);
 
-  return { settings, save, clampBpm, clampTimer, clampBeats, clampNoteValue };
+  return { settings, save, clampBpm, clampTimer, clampTimerSeconds, clampVolume, clampBeats, clampNoteValue };
 }
 
-export { clampBpm, clampTimer, clampBeats, clampNoteValue, DEFAULTS };
+export { clampBpm, clampTimer, clampTimerSeconds, clampVolume, clampBeats, clampNoteValue, DEFAULTS, VALID_SOUNDS };

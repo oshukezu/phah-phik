@@ -1,0 +1,16 @@
+.beat-arc {
+  display: block;
+  width: min(100%, 18rem);
+  height: auto;
+  margin: 0 auto 0.125rem;
+}
+
+.beat-arc-line {
+  stroke: var(--beat-arc-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.beat-arc-dot {
+  fill: var(--beat-arc-dot);
+}

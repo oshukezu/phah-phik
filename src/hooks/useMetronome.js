@@ -3,6 +3,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 export const SOUND_TYPES = {
   wood: { name: '木質' },
   electronic: { name: '電子' },
+  kick: { name: '底鼓' },
+  boing: { name: '彈簧' },
+  bell: { name: '清脆' },
+  frog: { name: '蛙鳴' },
 };
 
 const GAIN_ACCENT = 1.0;
@@ -17,11 +21,13 @@ export function useMetronome({
   beats,
   sound,
   accentEnabled,
+  volume,
   onBpmChange,
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [beatTick, setBeatTick] = useState(0);
+  const [beatProgress, setBeatProgress] = useState(0);
 
   const audioContextRef = useRef(null);
   const masterGainRef = useRef(null);
@@ -35,6 +41,7 @@ export function useMetronome({
 
   const accentEnabledRef = useRef(accentEnabled);
   const soundTypeRef = useRef(sound);
+  const volumeRef = useRef(volume);
   const bpmRef = useRef(bpm);
   const beatsRef = useRef(beats);
   const playSoundRef = useRef(() => {});
@@ -43,8 +50,20 @@ export function useMetronome({
 
   useEffect(() => { accentEnabledRef.current = accentEnabled; }, [accentEnabled]);
   useEffect(() => { soundTypeRef.current = sound; }, [sound]);
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
   useEffect(() => { bpmRef.current = bpm; }, [bpm]);
   useEffect(() => { beatsRef.current = beats; }, [beats]);
+
+  const applyMasterVolume = useCallback((value) => {
+    const ctx = audioContextRef.current;
+    const master = masterGainRef.current;
+    if (!ctx || !master) return;
+    master.gain.setValueAtTime(value, ctx.currentTime);
+  }, []);
+
+  useEffect(() => {
+    applyMasterVolume(volume);
+  }, [volume, applyMasterVolume]);
 
   const initAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
@@ -58,6 +77,7 @@ export function useMetronome({
     if (!ctx) return null;
     if (masterGainRef.current) masterGainRef.current.disconnect();
     const gain = ctx.createGain();
+    gain.gain.value = volumeRef.current;
     gain.connect(ctx.destination);
     masterGainRef.current = gain;
     return gain;
@@ -105,16 +125,101 @@ export function useMetronome({
     osc.stop(time + 0.09);
   }, []);
 
+  const playKick = useCallback((ctx, master, time, isAccent) => {
+    const gain = ctx.createGain();
+    gain.connect(master);
+    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isAccent ? 150 : 120, time);
+    osc.frequency.exponentialRampToValueAtTime(40, time + 0.08);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak * 1.2, time + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+    osc.connect(gain);
+    osc.start(time);
+    osc.stop(time + 0.13);
+  }, []);
+
+  const playBoing = useCallback((ctx, master, time, isAccent) => {
+    const gain = ctx.createGain();
+    gain.connect(master);
+    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isAccent ? 400 : 320, time);
+    osc.frequency.exponentialRampToValueAtTime(80, time + 0.15);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak, time + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    osc.connect(gain);
+    osc.start(time);
+    osc.stop(time + 0.21);
+  }, []);
+
+  const playBell = useCallback((ctx, master, time, isAccent) => {
+    const gain = ctx.createGain();
+    gain.connect(master);
+    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isAccent ? 1400 : 1100, time);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak * 0.9, time + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
+    osc.connect(gain);
+    osc.start(time);
+    osc.stop(time + 0.26);
+  }, []);
+
+  const playFrog = useCallback((ctx, master, time, isAccent) => {
+    const peak = isAccent ? GAIN_ACCENT : GAIN_WEAK;
+    const chirpCount = isAccent ? 4 : 3;
+    const spacing = 0.022;
+    const chirpDur = 0.018;
+    const baseFreq = isAccent ? 5200 : 4600;
+
+    for (let i = 0; i < chirpCount; i++) {
+      const t = time + i * spacing;
+      const gain = ctx.createGain();
+      gain.connect(master);
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, t);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.88, t + chirpDur);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(peak * 0.45, t + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + chirpDur);
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + chirpDur + 0.005);
+    }
+  }, []);
+
   const playSound = useCallback((time, isAccent) => {
     const ctx = audioContextRef.current;
     const master = masterGainRef.current;
     if (!ctx || !master) return;
-    if (soundTypeRef.current === 'electronic') {
-      playElectronic(ctx, master, time, isAccent);
-    } else {
-      playWood(ctx, master, time, isAccent);
+    switch (soundTypeRef.current) {
+      case 'electronic':
+        playElectronic(ctx, master, time, isAccent);
+        break;
+      case 'kick':
+        playKick(ctx, master, time, isAccent);
+        break;
+      case 'boing':
+        playBoing(ctx, master, time, isAccent);
+        break;
+      case 'bell':
+        playBell(ctx, master, time, isAccent);
+        break;
+      case 'frog':
+        playFrog(ctx, master, time, isAccent);
+        break;
+      default:
+        playWood(ctx, master, time, isAccent);
     }
-  }, [playElectronic, playWood]);
+  }, [playElectronic, playKick, playBoing, playBell, playFrog, playWood]);
 
   useEffect(() => {
     playSoundRef.current = playSound;
@@ -149,17 +254,28 @@ export function useMetronome({
 
       const currentTime = ctx.currentTime;
       let beatToShow = -1;
+      let beatStartTime = 0;
       for (let i = beatTimesRef.current.length - 1; i >= 0; i--) {
         if (beatTimesRef.current[i].time <= currentTime) {
           beatToShow = beatTimesRef.current[i].beat;
+          beatStartTime = beatTimesRef.current[i].time;
           break;
         }
       }
 
-      if (beatToShow !== -1 && beatToShow !== displayedBeatRef.current) {
-        displayedBeatRef.current = beatToShow;
-        setCurrentBeat(beatToShow);
-        setBeatTick((t) => t + 1);
+      if (beatToShow !== -1) {
+        const beatDuration = 60.0 / bpmRef.current;
+        const progress = Math.min(
+          1,
+          Math.max(0, (currentTime - beatStartTime) / beatDuration)
+        );
+        setBeatProgress(progress);
+
+        if (beatToShow !== displayedBeatRef.current) {
+          displayedBeatRef.current = beatToShow;
+          setCurrentBeat(beatToShow);
+          setBeatTick((t) => t + 1);
+        }
       }
 
       uiSyncerIdRef.current = setTimeout(() => syncUIRef.current(), 4);
@@ -218,6 +334,7 @@ export function useMetronome({
     }
     setIsPlaying(false);
     setCurrentBeat(0);
+    setBeatProgress(0);
   }, [stopSchedulers]);
 
   useEffect(() => {
@@ -245,6 +362,7 @@ export function useMetronome({
     isPlaying,
     currentBeat,
     beatTick,
+    beatProgress,
     toggle,
     start,
     stop,

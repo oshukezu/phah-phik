@@ -3,8 +3,10 @@ import { useMetronome } from '../hooks/useMetronome';
 import {
   useSettingsState,
   clampTimer,
+  clampTimerSeconds,
   clampBeats,
   clampNoteValue,
+  clampVolume,
   isStandalone,
   loadRaw,
 } from '../hooks/useSettings';
@@ -13,6 +15,7 @@ import { usePracticeTimer } from '../hooks/usePracticeTimer';
 import { useTheme } from '../hooks/useTheme';
 import MoreSettings from './MoreSettings';
 import TutorialOverlay from './TutorialOverlay';
+import BeatArc from './BeatArc';
 import './Metronome.css';
 
 const PRESETS = ['2', '3', '4'];
@@ -26,8 +29,11 @@ export default function Metronome() {
   );
   const [practiceEnd, setPracticeEnd] = useState(false);
   const [bpmInput, setBpmInput] = useState(String(settings.bpm));
-  const [timerInput, setTimerInput] = useState(
+  const [timerMinInput, setTimerMinInput] = useState(
     settings.timerMinutes > 0 ? String(settings.timerMinutes) : ''
+  );
+  const [timerSecInput, setTimerSecInput] = useState(
+    settings.timerSeconds > 0 ? String(settings.timerSeconds) : ''
   );
 
   const onBpmChange = useCallback((bpm) => {
@@ -40,6 +46,7 @@ export default function Metronome() {
     isPlaying,
     currentBeat,
     beatTick,
+    beatProgress,
     toggle,
     stop,
     clampBpm: clampBpmEngine,
@@ -48,6 +55,7 @@ export default function Metronome() {
     beats: settings.beats,
     sound: settings.sound,
     accentEnabled: settings.accentEnabled,
+    volume: settings.volume,
     onBpmChange,
   });
 
@@ -57,12 +65,12 @@ export default function Metronome() {
     stop();
     setPracticeEnd(true);
     if (navigator.vibrate) navigator.vibrate(200);
-    setTimeout(() => setPracticeEnd(false), 2500);
   }, [stop]);
 
   const { hasTimer, display: timerDisplay } = usePracticeTimer(
     isPlaying,
     settings.timerMinutes,
+    settings.timerSeconds,
     onTimerComplete
   );
 
@@ -80,14 +88,16 @@ export default function Metronome() {
   };
 
   const handleTimerBlur = () => {
-    const raw = timerInput === '' ? 0 : parseInt(timerInput, 10);
-    const v = Number.isFinite(raw) ? clampTimer(raw) : 0;
-    save({ timerMinutes: v });
-    setTimerInput(v > 0 ? String(v) : '');
+    const rawMin = timerMinInput === '' ? 0 : parseInt(timerMinInput, 10);
+    const rawSec = timerSecInput === '' ? 0 : parseInt(timerSecInput, 10);
+    const minutes = Number.isFinite(rawMin) ? clampTimer(rawMin) : 0;
+    const seconds = Number.isFinite(rawSec) ? clampTimerSeconds(rawSec) : 0;
+    save({ timerMinutes: minutes, timerSeconds: seconds });
+    setTimerMinInput(minutes > 0 ? String(minutes) : '');
+    setTimerSecInput(seconds > 0 ? String(seconds) : '');
   };
 
   const applyPreset = (preset) => {
-    if (isPlaying) return;
     if (preset === 'custom') {
       save({ timeSigMode: 'custom' });
       return;
@@ -120,7 +130,14 @@ export default function Metronome() {
       )}
 
       <div className="bpm-block">
-        <label className="bpm-input-wrap" htmlFor="bpm-input">
+        <div className="bpm-arc-stage">
+          <BeatArc
+            beats={settings.beats}
+            currentBeat={currentBeat}
+            beatProgress={beatProgress}
+            isPlaying={isPlaying}
+          />
+          <label className="bpm-input-wrap" htmlFor="bpm-input">
           <input
             id="bpm-input"
             type="text"
@@ -132,11 +149,11 @@ export default function Metronome() {
             onFocus={handleBpmFocus}
             onBlur={handleBpmBlur}
             onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
-            disabled={isPlaying}
             aria-label="每分鐘拍數"
           />
           <span className="bpm-label">每分鐘拍數</span>
         </label>
+        </div>
 
         <div
           className={`beat-dots ${manyDots ? 'beat-dots-many' : ''}`}
@@ -165,7 +182,6 @@ export default function Metronome() {
                 type="button"
                 className={`seg-btn ${settings.timeSigMode === p ? 'active' : ''}`}
                 onClick={() => applyPreset(p)}
-                disabled={isPlaying}
               >
                 {p}/4
               </button>
@@ -174,7 +190,6 @@ export default function Metronome() {
               type="button"
               className={`seg-btn ${settings.timeSigMode === 'custom' ? 'active' : ''}`}
               onClick={() => applyPreset('custom')}
-              disabled={isPlaying}
             >
               自訂
             </button>
@@ -190,7 +205,6 @@ export default function Metronome() {
                 value={settings.beats}
                 inputMode="numeric"
                 aria-label="拍號分子"
-                disabled={isPlaying}
                 onChange={(e) => {
                   const beats = clampBeats(Number(e.target.value));
                   save({ beats, timeSigMode: 'custom' });
@@ -202,7 +216,6 @@ export default function Metronome() {
                 className="timesig-select"
                 value={settings.noteValue}
                 aria-label="拍號分母"
-                disabled={isPlaying}
                 onChange={(e) => {
                   const noteValue = clampNoteValue(Number(e.target.value));
                   save({ noteValue, timeSigMode: 'custom' });
@@ -217,23 +230,36 @@ export default function Metronome() {
         </div>
 
         <div className="panel-block panel-block-row">
-          <label className="panel-label" htmlFor="timer-input">練習分鐘</label>
-          <div className="timer-row">
+          <span className="panel-label" id="timer-label">練習時間</span>
+          <div className="timer-row" aria-labelledby="timer-label">
             <input
-              id="timer-input"
+              id="timer-min-input"
               type="number"
-              className="timer-input"
+              className="timer-input timer-input-sm"
               min={0}
               max={180}
-              value={timerInput}
+              value={timerMinInput}
               placeholder="0"
               inputMode="numeric"
               aria-label="練習分鐘，0 為不限時"
-              disabled={isPlaying}
-              onChange={(e) => setTimerInput(e.target.value)}
+              onChange={(e) => setTimerMinInput(e.target.value)}
               onBlur={handleTimerBlur}
             />
-            <span className="timer-unit">分鐘</span>
+            <span className="timer-unit">分</span>
+            <input
+              id="timer-sec-input"
+              type="number"
+              className="timer-input timer-input-sm"
+              min={0}
+              max={59}
+              value={timerSecInput}
+              placeholder="0"
+              inputMode="numeric"
+              aria-label="練習秒數，0 為不限時"
+              onChange={(e) => setTimerSecInput(e.target.value)}
+              onBlur={handleTimerBlur}
+            />
+            <span className="timer-unit">秒</span>
             {hasTimer && (
               <span className="timer-countdown" aria-live="polite">{timerDisplay}</span>
             )}
@@ -241,39 +267,52 @@ export default function Metronome() {
         </div>
       </section>
 
-      <MoreSettings
-        open={moreOpen}
-        onToggleOpen={() => setMoreOpen((o) => !o)}
-        accentEnabled={settings.accentEnabled}
-        onAccentChange={(v) => save({ accentEnabled: v })}
-        flashEnabled={settings.flashEnabled}
-        onFlashChange={(v) => save({ flashEnabled: v })}
-        sound={settings.sound}
-        onSoundChange={(v) => save({ sound: v })}
-        themeMode={themeMode}
-        onThemeChange={setTheme}
-        onShowTutorial={() => setShowTutorial(true)}
-        disabled={isPlaying}
-      />
+      <div className="metronome-footer">
+        <footer className="controls">
+          <button
+            type="button"
+            className={`ctrl-play ${isPlaying ? 'playing' : ''}`}
+            onClick={toggle}
+            aria-label={isPlaying ? '停止' : '開始'}
+          >
+            {isPlaying ? '停止' : '開始'}
+          </button>
+        </footer>
 
-      <footer className="controls">
-        <button
-          type="button"
-          className={`ctrl-play ${isPlaying ? 'playing' : ''}`}
-          onClick={toggle}
-          aria-label={isPlaying ? '停止' : '開始'}
-        >
-          {isPlaying ? '停止' : '開始'}
-        </button>
-      </footer>
+        <MoreSettings
+          open={moreOpen}
+          onToggleOpen={() => setMoreOpen((o) => !o)}
+          accentEnabled={settings.accentEnabled}
+          onAccentChange={(v) => save({ accentEnabled: v })}
+          flashEnabled={settings.flashEnabled}
+          onFlashChange={(v) => save({ flashEnabled: v })}
+          volume={settings.volume}
+          onVolumeChange={(v) => save({ volume: clampVolume(v) })}
+          sound={settings.sound}
+          onSoundChange={(v) => save({ sound: v })}
+          themeMode={themeMode}
+          onThemeChange={setTheme}
+          onShowTutorial={() => setShowTutorial(true)}
+        />
+
+        <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
+      </div>
 
       {!hasWakeLock && isPlaying && (
         <p className="wake-hint">請保持螢幕亮著練習</p>
       )}
 
       {practiceEnd && (
-        <div className="practice-end" role="alert">
-          <p>練習結束</p>
+        <div
+          className="practice-end"
+          role="alertdialog"
+          aria-labelledby="practice-end-title"
+          onClick={() => setPracticeEnd(false)}
+        >
+          <div className="practice-end-card">
+            <p id="practice-end-title" className="practice-end-title">練習結束</p>
+            <p className="practice-end-hint">點選任意處關閉</p>
+          </div>
         </div>
       )}
 
