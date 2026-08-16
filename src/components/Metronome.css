@@ -94,6 +94,25 @@
   flex-direction: column;
   min-height: 100dvh;
   padding: calc(1.25rem + var(--safe-top)) 1rem calc(1.5rem + var(--safe-bottom));
+  gap: 0.5rem;
+}
+
+.metronome-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  min-height: 0;
+}
+
+.metronome-zone {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.metronome-zone-bpm {
   gap: 0.75rem;
 }
 
@@ -108,7 +127,6 @@
   text-align: center;
   flex-shrink: 0;
   padding-top: 0.25rem;
-  margin-bottom: -0.25rem;
 }
 
 .bpm-arc-stage {
@@ -215,9 +233,9 @@
 .home-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-shrink: 0;
-  margin-top: 0.125rem;
+  width: 100%;
 }
 
 .ios-idle-sound-banner {
@@ -391,8 +409,9 @@
 }
 
 .controls {
-  margin-top: 0.5rem;
+  margin-top: 0;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .ctrl-play {
@@ -413,19 +432,9 @@
 }
 
 .wake-hint,
-.playback-hints {
-  margin: 0;
-  text-align: center;
-}
-
-.playback-hints {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
 .playback-hint {
   margin: 0;
+  text-align: center;
   font-size: 0.875rem;
   color: var(--text-muted);
 }

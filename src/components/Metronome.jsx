@@ -67,7 +67,6 @@ export default function Metronome() {
 
   const { hasSupport: hasWakeLock } = useWakeLock(isPlaying);
   const showIosIdleBanner = isIOS() && !isPlaying;
-  const showIosSoundHint = isIOS() && isPlaying;
   const showWakeHint = !hasWakeLock && isPlaying;
 
   const onTimerComplete = useCallback(() => {
@@ -207,56 +206,60 @@ export default function Metronome() {
         </div>
       )}
 
-      <div className="bpm-block">
-        <div className="bpm-arc-stage">
-          <BeatArc
-            beats={settings.beats}
-            currentBeat={currentBeat}
-            beatProgress={beatProgress}
-            isPlaying={isPlaying}
-          />
-          <label className="bpm-input-wrap" htmlFor="bpm-input">
-          <input
-            id="bpm-input"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            className="bpm-input"
-            value={bpmInput}
-            onChange={(e) => setBpmInput(e.target.value)}
-            onFocus={handleBpmFocus}
-            onBlur={handleBpmBlur}
-            onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
-            aria-label="每分鐘拍數"
-          />
-          <span className="bpm-label">每分鐘拍數</span>
-        </label>
+      <div className="metronome-main">
+        <div className="metronome-zone metronome-zone-bpm">
+          <div className="bpm-block">
+            <div className="bpm-arc-stage">
+              <BeatArc
+                beats={settings.beats}
+                currentBeat={currentBeat}
+                beatProgress={beatProgress}
+                isPlaying={isPlaying}
+              />
+              <label className="bpm-input-wrap" htmlFor="bpm-input">
+              <input
+                id="bpm-input"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className="bpm-input"
+                value={bpmInput}
+                onChange={(e) => setBpmInput(e.target.value)}
+                onFocus={handleBpmFocus}
+                onBlur={handleBpmBlur}
+                onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+                aria-label="每分鐘拍數"
+              />
+              <span className="bpm-label">每分鐘拍數</span>
+            </label>
+            </div>
+
+            <div
+              className={`beat-dots ${manyDots ? 'beat-dots-many' : ''}`}
+              aria-label="拍點指示"
+            >
+              {Array.from({ length: settings.beats }, (_, i) => (
+                <span
+                  key={i}
+                  className={[
+                    'beat-dot',
+                    isPlaying && currentBeat === i ? 'active' : '',
+                    i === 0 && settings.accentEnabled ? 'accent-marker' : '',
+                  ].filter(Boolean).join(' ')}
+                />
+              ))}
+            </div>
+          </div>
+
+          {showIosIdleBanner && (
+            <p className="ios-idle-sound-banner" role="note">
+              請確認已關閉靜音鍵，或接上耳機；開始後可調媒體音量
+            </p>
+          )}
         </div>
 
-        <div
-          className={`beat-dots ${manyDots ? 'beat-dots-many' : ''}`}
-          aria-label="拍點指示"
-        >
-          {Array.from({ length: settings.beats }, (_, i) => (
-            <span
-              key={i}
-              className={[
-                'beat-dot',
-                isPlaying && currentBeat === i ? 'active' : '',
-                i === 0 && settings.accentEnabled ? 'accent-marker' : '',
-              ].filter(Boolean).join(' ')}
-            />
-          ))}
-        </div>
-      </div>
-
-      {showIosIdleBanner && (
-        <p className="ios-idle-sound-banner" role="note">
-          請確認已關閉靜音鍵，或接上耳機；開始後可調媒體音量
-        </p>
-      )}
-
-      <section className="home-panel" aria-label="拍號與練習時間">
+        <div className="metronome-zone metronome-zone-panel">
+          <section className="home-panel" aria-label="拍號與練習時間">
         <div className="timesig-block">
           <div className="panel-block panel-block-row">
             <span className="panel-label">拍號</span>
@@ -360,19 +363,23 @@ export default function Metronome() {
           </div>
         </div>
       </section>
+        </div>
+
+        <div className="metronome-zone metronome-zone-play">
+          <footer className="controls">
+            <button
+              type="button"
+              className={`ctrl-play ${isPlaying ? 'playing' : ''}`}
+              onClick={handlePlayToggle}
+              aria-label={isPlaying ? '停止' : '開始'}
+            >
+              {isPlaying ? '停止' : '開始'}
+            </button>
+          </footer>
+        </div>
+      </div>
 
       <div className="metronome-footer">
-        <footer className="controls">
-          <button
-            type="button"
-            className={`ctrl-play ${isPlaying ? 'playing' : ''}`}
-            onClick={handlePlayToggle}
-            aria-label={isPlaying ? '停止' : '開始'}
-          >
-            {isPlaying ? '停止' : '開始'}
-          </button>
-        </footer>
-
         <MoreSettings
           open={moreOpen}
           onToggleOpen={() => setMoreOpen((o) => !o)}
@@ -394,15 +401,8 @@ export default function Metronome() {
         <p className="app-credit">拍魄仔 Developed by J.J. Wang</p>
       </div>
 
-      {(showIosSoundHint || showWakeHint) && (
-        <div className="playback-hints">
-          {showIosSoundHint && (
-            <p className="playback-hint">聽不到聲音？請關閉靜音鍵或接耳機</p>
-          )}
-          {showWakeHint && (
-            <p className="playback-hint">請保持螢幕亮著練習</p>
-          )}
-        </div>
+      {showWakeHint && (
+        <p className="playback-hint">請保持螢幕亮著練習</p>
       )}
 
       {practiceEnd && (
