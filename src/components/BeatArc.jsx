@@ -16,11 +16,13 @@ function arcPoint(angle) {
   };
 }
 
-function indicatorAngle(beats, currentBeat, beatProgress, isPlaying) {
+function indicatorAngle(_beats, currentBeat, beatProgress, isPlaying) {
   if (!isPlaying) return Math.PI / 2;
-  if (beats <= 1) return Math.PI / 2;
-  const fractionalBeat = currentBeat + beatProgress;
-  return Math.PI - (fractionalBeat / (beats - 1)) * Math.PI;
+  const t = Math.min(1, Math.max(0, beatProgress));
+  const goingRight = currentBeat % 2 === 0;
+  const from = goingRight ? Math.PI : 0;
+  const to = goingRight ? 0 : Math.PI;
+  return from + (to - from) * t;
 }
 
 export default function BeatArc({

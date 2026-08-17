@@ -22,6 +22,7 @@
 | 文件 | README、本結構說明、工作日誌 |
 | BeatArc | BPM 上方半圓弧節拍圖（試作） |
 | BeatArc 修正 | 加寬弧線、修正 viewBox 裁切；單一圓點連續滑動；淡色單色階（指示點比弧線略深） |
+| BeatArc 鐘擺 | 指示點每拍掃完整弧、左右交替；端點不瞬移；停止時回頂點 |
 | 音色 | 底鼓改為鵝叫（`goose`）；`kick` 設定自動遷移；鵝叫改為 F0 陽平 + F1/F2 母音合成 |
 | 圖示 | 主畫面／PWA：`metronome.png`；瀏覽器分頁 favicon：`duck-face.png` |
 | iOS 靜音 UX | 教學與播放中提示靜音鍵／耳機；`mediaSession`；背景切回時 `AudioContext.resume` |
