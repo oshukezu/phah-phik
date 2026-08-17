@@ -3,12 +3,12 @@ const GOOSE_ACCENT_DURATION = 0.55;
 const GOOSE_WEAK_DURATION = 0.42;
 const GOOSE_ACCENT_RATE = 0.92;
 const GOOSE_WEAK_RATE = 0.88;
-const GOOSE_GAIN_BOOST = 1.5;
+const GOOSE_GAIN_BOOST = 2.7;
 
 let gooseBufferPromise = null;
 
 function boostedPeak(peak) {
-  return Math.min(peak * GOOSE_GAIN_BOOST, 1.5);
+  return Math.min(peak * GOOSE_GAIN_BOOST, 2.7);
 }
 
 export function getGooseSampleUrl() {
